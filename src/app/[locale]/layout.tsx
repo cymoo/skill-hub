@@ -29,7 +29,7 @@ export default async function LocaleLayout({
   const messages = (await import(`../../../messages/${locale}.json`)).default;
 
   return (
-    <html lang={locale} className="dark">
+    <html lang={locale}>
       <body className="min-h-screen flex flex-col bg-bg text-text antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Header />

@@ -1,24 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0a0f0d;
-  --color-surface: #141c18;
-  --color-surface-hover: #1a2620;
-  --color-surface-raised: #1e2d25;
-  --color-accent: #d4a853;
-  --color-accent-hover: #e0b960;
-  --color-accent-muted: #b8923f;
-  --color-text: #e8e6e1;
-  --color-text-muted: #8a9189;
-  --color-text-dim: #5a6560;
-  --color-border: #2a3530;
-  --color-border-hover: #3a4a42;
-  --color-danger: #e05252;
-  --color-danger-hover: #c94040;
-  --color-success: #4ade80;
+  --color-bg: #f6f3ed;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f7f1e7;
+  --color-surface-raised: #fffcf7;
+  --color-accent: #b9772b;
+  --color-accent-hover: #9e6422;
+  --color-accent-muted: #d7b383;
+  --color-text: #2f2218;
+  --color-text-muted: #6c5a4b;
+  --color-text-dim: #907a66;
+  --color-border: #dfd1bf;
+  --color-border-hover: #cab394;
+  --color-danger: #d54e42;
+  --color-danger-hover: #bd4035;
+  --color-success: #2d8e60;
 
-  --font-display: "Georgia", "Times New Roman", serif;
-  --font-body: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Bodoni MT", "Didot", "Times New Roman", serif;
+  --font-body: "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
 }
 
@@ -30,10 +31,22 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-bg);
+  background:
+    radial-gradient(
+      circle at 12% 14%,
+      color-mix(in srgb, var(--color-accent) 11%, transparent) 0,
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 87% 18%,
+      color-mix(in srgb, var(--color-accent) 10%, transparent) 0,
+      transparent 44%
+    ),
+    var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 /* Scrollbar */
@@ -43,11 +56,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: color-mix(in srgb, var(--color-bg) 80%, white);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: color-mix(in srgb, var(--color-border) 80%, var(--color-accent) 20%);
   border-radius: 3px;
 }
 
