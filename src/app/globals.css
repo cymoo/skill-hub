@@ -23,12 +23,6 @@
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: var(--font-body);
   background:
