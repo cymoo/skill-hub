@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -178,16 +178,16 @@ export default function SkillDetailPage({
       .catch(() => {});
   }, [skill, id]);
 
-  const refreshFileTree = async () => {
+  const refreshFileTree = useCallback(async () => {
     const res = await fetch(`/api/skills/${id}/files`);
     const data = await res.json();
     setFileTree(data);
-  };
+  }, [id]);
 
   useEffect(() => {
     if (!skill) return;
     refreshFileTree().catch(() => {});
-  }, [skill, id]);
+  }, [skill, refreshFileTree]);
 
   useEffect(() => {
     if (!skill) return;
