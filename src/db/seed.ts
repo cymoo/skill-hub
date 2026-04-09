@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { users, categories, skills } from "./schema";
 import { hash } from "bcryptjs";
-import { generateStoragePath, getSkillFullPath } from "../lib/storage";
+import { generateStoragePath } from "../lib/storage";
 import fs from "fs/promises";
 import path from "path";
 
