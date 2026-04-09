@@ -50,12 +50,12 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-bg/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-bg/75 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl border border-accent/15 bg-accent/10 group-hover:bg-accent/15 transition-colors">
               <Sparkles className="h-5 w-5 text-accent" />
             </div>
             <span className="font-[family-name:var(--font-display)] text-xl font-bold tracking-tight">
@@ -71,7 +71,7 @@ export function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-accent/20 text-accent text-xs font-bold">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-accent/15 text-accent text-xs font-bold">
                       {user.username[0].toUpperCase()}
                     </div>
                     {user.username}
@@ -109,7 +109,7 @@ export function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 text-text-muted hover:text-text"
+            className="md:hidden p-2 rounded-lg text-text-muted hover:text-text hover:bg-surface-hover"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
