@@ -29,7 +29,7 @@ export async function writeFile(
 ): Promise<void> {
   const fullPath = sanitizePath(getSkillFullPath(skillPath), filePath);
   await ensureDir(path.dirname(fullPath));
-  await fs.writeFile(fullPath, content, "utf-8");
+  await fs.writeFile(fullPath, content);
 }
 
 export async function readFile(
