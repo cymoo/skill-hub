@@ -32,6 +32,14 @@ export async function writeFile(
   await fs.writeFile(fullPath, content);
 }
 
+export async function createDirectory(
+  skillPath: string,
+  directoryPath: string
+): Promise<void> {
+  const fullPath = sanitizePath(getSkillFullPath(skillPath), directoryPath);
+  await ensureDir(fullPath);
+}
+
 export async function readFile(
   skillPath: string,
   filePath: string

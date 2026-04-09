@@ -3,7 +3,7 @@ import { z } from "zod/v4";
 export const registerSchema = z.object({
   username: z
     .string()
-    .min(3, "Username must be at least 3 characters")
+    .min(2, "Username must be at least 2 characters")
     .max(50, "Username must be at most 50 characters")
     .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, hyphens and underscores"),
   email: z.string().email("Invalid email address"),

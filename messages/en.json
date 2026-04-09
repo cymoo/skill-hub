@@ -74,7 +74,11 @@
     "category": "Category",
     "license": "License",
     "uploadedAt": "Uploaded",
-    "loginToStar": "Sign in to star this skill"
+    "loginToStar": "Sign in to star this skill",
+    "createFile": "Create file",
+    "createFolder": "Create folder",
+    "newFilePath": "Enter new file path (e.g. docs/guide.md):",
+    "newFolderPath": "Enter new folder path (e.g. docs/examples):"
   },
   "dashboard": {
     "title": "My Dashboard",

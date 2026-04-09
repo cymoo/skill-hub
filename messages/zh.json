@@ -74,7 +74,11 @@
     "category": "分类",
     "license": "许可证",
     "uploadedAt": "上传于",
-    "loginToStar": "登录后可收藏此技能"
+    "loginToStar": "登录后可收藏此技能",
+    "createFile": "创建文件",
+    "createFolder": "创建文件夹",
+    "newFilePath": "请输入新文件路径（例如 docs/guide.md）：",
+    "newFolderPath": "请输入新文件夹路径（例如 docs/examples）："
   },
   "dashboard": {
     "title": "我的控制台",
