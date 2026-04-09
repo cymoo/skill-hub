@@ -181,7 +181,7 @@ export default function HomePage() {
         <div className="relative rounded-[2rem] border border-border bg-surface/90 px-6 py-9 sm:px-10 shadow-[0_32px_70px_-46px_color-mix(in_srgb,var(--color-text)_38%,transparent)]">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div className="space-y-4">
-              <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl leading-[0.96] tracking-tight text-accent">
+              <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl leading-tight tracking-tight text-accent">
                 {t("title")}
               </h1>
               <p className="font-[family-name:var(--font-display)] text-2xl text-text-muted">

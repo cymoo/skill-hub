@@ -19,7 +19,7 @@
   --color-success: #2d8e60;
 
   --font-display: "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
-  --font-body: "Trebuchet MS", "Segoe UI", "Tahoma", system-ui, sans-serif;
+  --font-body: system-ui, "Segoe UI", "Trebuchet MS", "Tahoma", sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
 }
 
