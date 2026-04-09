@@ -270,7 +270,7 @@ export default function HomePage() {
                 className={cn(
                   "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200",
                   !selectedCategory
-                    ? "bg-accent text-white border-accent"
+                    ? "bg-accent text-on-solid border-accent"
                     : "bg-surface text-text-muted hover:text-text hover:bg-surface-hover border-border"
                 )}
               >
@@ -287,7 +287,7 @@ export default function HomePage() {
                   className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200",
                     selectedCategory === cat.slug
-                      ? "bg-accent text-white border-accent"
+                      ? "bg-accent text-on-solid border-accent"
                       : "bg-surface text-text-muted hover:text-text hover:bg-surface-hover border-border"
                   )}
                 >
