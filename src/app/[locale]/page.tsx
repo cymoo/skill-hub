@@ -53,7 +53,7 @@ export default function HomePage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [sort, setSort] = useState("created_at");
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
@@ -74,7 +74,7 @@ export default function HomePage() {
           order: "desc",
         });
         if (search) params.set("search", search);
-        if (selectedCategory) params.set("category", selectedCategory);
+        if (selectedCategoryId) params.set("categoryId", selectedCategoryId);
 
         const res = await fetch(`/api/skills?${params}`);
         const data = await res.json();
@@ -92,7 +92,7 @@ export default function HomePage() {
         setLoading(false);
       }
     },
-    [search, selectedCategory, sort, tc]
+    [search, selectedCategoryId, sort, tc]
   );
 
   useEffect(() => {
@@ -265,32 +265,32 @@ export default function HomePage() {
         <div className="rounded-[1.75rem] border border-border bg-surface/90 p-5 sm:p-7 shadow-[0_20px_45px_-38px_color-mix(in_srgb,var(--color-text)_34%,transparent)]">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto scrollbar-none">
-              <button
-                onClick={() => setSelectedCategory("")}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200",
-                  !selectedCategory
-                    ? "bg-accent text-on-solid border-accent"
-                    : "bg-surface text-text-muted hover:text-text hover:bg-surface-hover border-border"
-                )}
-              >
-                {tc("all")}
-              </button>
-              {categories.map((cat) => (
                 <button
-                  key={cat.slug}
-                  onClick={() =>
-                    setSelectedCategory(
-                      selectedCategory === cat.slug ? "" : cat.slug
-                    )
-                  }
-                  className={cn(
-                    "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200",
-                    selectedCategory === cat.slug
-                      ? "bg-accent text-on-solid border-accent"
-                      : "bg-surface text-text-muted hover:text-text hover:bg-surface-hover border-border"
-                  )}
-                >
+                 onClick={() => setSelectedCategoryId("")}
+                 className={cn(
+                   "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200",
+                   !selectedCategoryId
+                     ? "bg-accent text-on-solid border-accent"
+                     : "bg-surface text-text-muted hover:text-text hover:bg-surface-hover border-border"
+                 )}
+               >
+                 {tc("all")}
+               </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                   onClick={() =>
+                     setSelectedCategoryId(
+                       selectedCategoryId === String(cat.id) ? "" : String(cat.id)
+                     )
+                   }
+                   className={cn(
+                     "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200",
+                     selectedCategoryId === String(cat.id)
+                       ? "bg-accent text-on-solid border-accent"
+                       : "bg-surface text-text-muted hover:text-text hover:bg-surface-hover border-border"
+                   )}
+                 >
                   {cat.name}
                 </button>
               ))}

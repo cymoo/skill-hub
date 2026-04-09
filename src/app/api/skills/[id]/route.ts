@@ -99,7 +99,29 @@ export async function PATCH(
     const updates: Record<string, unknown> = {};
 
     if (body.categoryId !== undefined) {
-      updates.categoryId = body.categoryId;
+      if (body.categoryId === null) {
+        updates.categoryId = null;
+      } else if (typeof body.categoryId === "number") {
+        const [category] = await db
+          .select({ id: categories.id })
+          .from(categories)
+          .where(eq(categories.id, body.categoryId))
+          .limit(1);
+
+        if (!category) {
+          return NextResponse.json(
+            { error: "Category not found" },
+            { status: 400 }
+          );
+        }
+
+        updates.categoryId = body.categoryId;
+      } else {
+        return NextResponse.json(
+          { error: "Invalid categoryId" },
+          { status: 400 }
+        );
+      }
     }
     if (body.description !== undefined) {
       updates.description = body.description;

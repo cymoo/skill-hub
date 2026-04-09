@@ -1,11 +1,18 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/components/ui/use-toast";
@@ -32,6 +39,8 @@ import {
   Save,
   X,
   Pencil,
+  FilePlus2,
+  FolderPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils";
@@ -74,6 +83,41 @@ interface AuthorSkill {
   categoryName: string | null;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+function stripFrontmatter(content: string): string {
+  if (!content.startsWith("---")) return content;
+  return content.replace(/^---[\s\S]*?\n---\s*/m, "");
+}
+
+function getLanguageFromPath(filePath: string): string {
+  const extension = filePath.split(".").pop()?.toLowerCase() || "";
+  const map: Record<string, string> = {
+    ts: "typescript",
+    tsx: "tsx",
+    js: "javascript",
+    jsx: "jsx",
+    json: "json",
+    md: "markdown",
+    py: "python",
+    go: "go",
+    java: "java",
+    rs: "rust",
+    sh: "bash",
+    yml: "yaml",
+    yaml: "yaml",
+    html: "html",
+    css: "css",
+    sql: "sql",
+    xml: "xml",
+  };
+  return map[extension] || "plaintext";
+}
+
 export default function SkillDetailPage({
   params,
 }: {
@@ -92,6 +136,7 @@ export default function SkillDetailPage({
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState<string>("");
   const [authorSkills, setAuthorSkills] = useState<AuthorSkill[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -128,18 +173,21 @@ export default function SkillDetailPage({
     fetch(`/api/skills/${id}/files/SKILL.md`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.content) setReadme(data.content);
+        if (data.content) setReadme(stripFrontmatter(data.content));
       })
       .catch(() => {});
   }, [skill, id]);
 
+  const refreshFileTree = useCallback(async () => {
+    const res = await fetch(`/api/skills/${id}/files`);
+    const data = await res.json();
+    setFileTree(data);
+  }, [id]);
+
   useEffect(() => {
     if (!skill) return;
-    fetch(`/api/skills/${id}/files`)
-      .then((res) => res.json())
-      .then((data) => setFileTree(data))
-      .catch(() => {});
-  }, [skill, id]);
+    refreshFileTree().catch(() => {});
+  }, [skill, refreshFileTree]);
 
   useEffect(() => {
     if (!skill) return;
@@ -148,6 +196,13 @@ export default function SkillDetailPage({
       .then((data) => setAuthorSkills(data.skills || []))
       .catch(() => {});
   }, [skill, id]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data.categories || []))
+      .catch(() => {});
+  }, []);
 
   const handleStar = async () => {
     if (!skill) return;
@@ -230,7 +285,7 @@ export default function SkillDetailPage({
         toast({ title: tc("success"), variant: "success" });
 
         if (selectedFile === "SKILL.md") {
-          setReadme(editContent);
+          setReadme(stripFrontmatter(editContent));
         }
       } else {
         toast({ title: tc("error"), variant: "destructive" });
@@ -241,6 +296,75 @@ export default function SkillDetailPage({
       setSaving(false);
     }
   };
+
+  const handleUpdateCategory = async (value: string) => {
+    if (!skill || !isOwner) return;
+    const categoryId = value === "__none__" ? null : Number.parseInt(value, 10);
+    if (value !== "__none__" && Number.isNaN(categoryId)) {
+      toast({ title: tc("error"), variant: "destructive" });
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/skills/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        toast({ title: data.error || tc("error"), variant: "destructive" });
+        return;
+      }
+
+      const selected = categoryId
+        ? categories.find((c) => c.id === categoryId) || null
+        : null;
+      setSkill({
+        ...skill,
+        categoryId,
+        categoryName: selected?.name || null,
+        categorySlug: selected?.slug || null,
+      });
+      toast({ title: tc("success"), variant: "success" });
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
+  const handleCreateInFiles = async (type: "file" | "directory") => {
+    if (!isOwner) return;
+    const message = type === "file" ? t("newFilePath") : t("newFolderPath");
+    const inputPath = prompt(message, type === "file" ? "new-file.md" : "new-folder");
+    if (!inputPath) return;
+
+    try {
+      const res = await fetch(`/api/skills/${id}/files`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, path: inputPath }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: data.error || tc("error"), variant: "destructive" });
+        return;
+      }
+
+      await refreshFileTree();
+      if (type === "file") {
+        await handleSelectFile(inputPath);
+      }
+      toast({ title: tc("success"), variant: "success" });
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
+  const filePreviewMarkdown = selectedFile
+    ? `\`\`\`${getLanguageFromPath(selectedFile)}\n${fileContent}\n\`\`\`\n`
+    : "";
 
   if (loading) {
     return (
@@ -318,17 +442,41 @@ export default function SkillDetailPage({
               {skill.categoryName}
             </Badge>
           )}
-          {skill.license && (
+          {skill.license &&
+            !/proprietary/i.test(skill.license) &&
+            !/license\.txt/i.test(skill.license) && (
             <span className="flex items-center gap-1.5">
               <Shield className="h-4 w-4" />
               {skill.license}
             </span>
-          )}
+            )}
           <span className="flex items-center gap-1.5">
             <Clock className="h-4 w-4" />
             {t("uploadedAt")}: {formatRelativeTime(new Date(skill.createdAt), locale)}
           </span>
         </div>
+        {isOwner && (
+          <div className="mt-4 w-full max-w-xs">
+            <Select
+              value={
+                skill.categoryId === null ? "__none__" : String(skill.categoryId)
+              }
+              onValueChange={handleUpdateCategory}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("category")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">{tc("all")}</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={String(cat.id)}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -374,10 +522,30 @@ export default function SkillDetailPage({
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[500px]">
               {/* File Tree */}
               <div className="border-r border-border bg-surface">
-                <div className="p-3 border-b border-border">
-                  <h3 className="text-sm font-medium text-text-muted">
-                    {t("files")}
-                  </h3>
+                <div className="p-3 border-b border-border flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-medium text-text-muted">{t("files")}</h3>
+                  {isOwner && (
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => handleCreateInFiles("directory")}
+                        title={t("createFolder")}
+                      >
+                        <FolderPlus className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => handleCreateInFiles("file")}
+                        title={t("createFile")}
+                      >
+                        <FilePlus2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <ScrollArea className="h-[500px]">
                   <div className="p-2">
@@ -450,9 +618,16 @@ export default function SkillDetailPage({
                           spellCheck={false}
                         />
                       ) : (
-                        <pre className="p-4 font-[family-name:var(--font-mono)] text-sm leading-relaxed whitespace-pre-wrap break-all">
-                          {fileContent}
-                        </pre>
+                        <div className="p-4">
+                          <div className="prose max-w-none">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+                            >
+                              {filePreviewMarkdown}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
                       )}
                     </ScrollArea>
                   </>

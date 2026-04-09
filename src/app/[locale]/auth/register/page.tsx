@@ -90,6 +90,7 @@ export default function RegisterPage() {
                 id="username"
                 name="username"
                 required
+                minLength={2}
                 placeholder="johndoe"
                 autoComplete="username"
               />

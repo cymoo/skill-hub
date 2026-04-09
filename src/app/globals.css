@@ -158,3 +158,35 @@ body {
   background: var(--color-surface) !important;
   color: var(--color-text) !important;
 }
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-name {
+  color: #8f571f;
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag {
+  color: #2d8e60;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-built_in,
+.hljs-type {
+  color: #225c9b;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--color-text-dim);
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: #9e5a13;
+}

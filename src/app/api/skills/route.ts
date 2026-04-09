@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     );
     const search = searchParams.get("search") || "";
     const categorySlug = searchParams.get("category") || "";
+    const categoryIdParam = searchParams.get("categoryId") || "";
     const owner = searchParams.get("owner") || "";
     const sort = searchParams.get("sort") || "created_at";
     const order = searchParams.get("order") || "desc";
@@ -33,7 +34,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (categorySlug) {
+    if (categoryIdParam) {
+      const categoryId = Number.parseInt(categoryIdParam, 10);
+      if (!Number.isNaN(categoryId)) {
+        conditions.push(eq(skills.categoryId, categoryId));
+      }
+    } else if (categorySlug) {
       const [cat] = await db
         .select({ id: categories.id })
         .from(categories)
