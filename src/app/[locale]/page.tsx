@@ -149,7 +149,7 @@ export default function HomePage() {
               ? {
                   ...s,
                   isStarred,
-                  starCount: isStarred ? s.starCount : s.starCount - 1,
+                  starCount: isStarred ? s.starCount + 1 : s.starCount - 1,
                 }
               : s
           )
@@ -162,7 +162,7 @@ export default function HomePage() {
             ? {
                 ...s,
                 isStarred,
-                starCount: isStarred ? s.starCount : s.starCount - 1,
+                starCount: isStarred ? s.starCount + 1 : s.starCount - 1,
               }
             : s
         )
