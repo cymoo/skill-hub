@@ -178,7 +178,7 @@ export default function HomePage() {
     <div className="pb-16">
       <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
         <div className="absolute inset-x-4 top-8 h-64 rounded-[2rem] bg-gradient-to-r from-accent/10 via-accent/5 to-transparent blur-3xl pointer-events-none" />
-        <div className="relative rounded-[2rem] border border-border bg-surface/90 px-6 py-9 sm:px-10 shadow-[0_32px_70px_-46px_rgba(74,50,25,0.55)]">
+        <div className="relative rounded-[2rem] border border-border bg-surface/90 px-6 py-9 sm:px-10 shadow-[0_32px_70px_-46px_color-mix(in_srgb,var(--color-text)_38%,transparent)]">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div className="space-y-4">
               <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl lg:text-7xl leading-[0.96] tracking-tight text-accent">
@@ -262,7 +262,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10">
-        <div className="rounded-[1.75rem] border border-border bg-surface/90 p-5 sm:p-7 shadow-[0_20px_45px_-38px_rgba(62,42,24,0.55)]">
+        <div className="rounded-[1.75rem] border border-border bg-surface/90 p-5 sm:p-7 shadow-[0_20px_45px_-38px_color-mix(in_srgb,var(--color-text)_34%,transparent)]">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto scrollbar-none">
               <button
@@ -347,7 +347,10 @@ export default function HomePage() {
                 >
                   <Link href={`/skills/${skill.id}`} className="block p-6">
                     <div className="flex items-start justify-between gap-3 mb-3">
-                      <h3 className="font-[family-name:var(--font-display)] text-2xl leading-tight font-semibold group-hover:text-accent transition-colors line-clamp-1">
+                      <h3
+                        className="font-[family-name:var(--font-display)] text-2xl leading-tight font-semibold group-hover:text-accent transition-colors line-clamp-1"
+                        title={skill.name}
+                      >
                         {skill.name}
                       </h3>
                       {skill.categoryName && (
