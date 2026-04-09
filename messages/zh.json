@@ -37,6 +37,8 @@
     "filterOwner": "作者",
     "stars": "收藏",
     "downloads": "下载",
+    "totalSkills": "总技能数",
+    "totalStars": "总星标数",
     "loadMore": "加载更多",
     "skillCount": "共找到 {count} 个技能"
   },

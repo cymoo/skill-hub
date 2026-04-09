@@ -37,6 +37,8 @@
     "filterOwner": "Owner",
     "stars": "stars",
     "downloads": "downloads",
+    "totalSkills": "Total Skills",
+    "totalStars": "Total Stars",
     "loadMore": "Load More",
     "skillCount": "{count} skills found"
   },
