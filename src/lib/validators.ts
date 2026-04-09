@@ -37,6 +37,11 @@ export const filePathSchema = z
   .string()
   .min(1)
   .refine(
-    (val) => !val.includes("..") && !val.startsWith("/"),
+    (val) =>
+      !val.includes("..") &&
+      !val.startsWith("/") &&
+      !val.includes("\\") &&
+      !val.includes("\0") &&
+      !/^[a-zA-Z]:/.test(val),
     "Invalid file path"
   );

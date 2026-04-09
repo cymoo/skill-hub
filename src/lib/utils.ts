@@ -16,8 +16,7 @@ export function slugify(text: string): string {
 
 export function formatRelativeTime(date: Date, locale: string = "en"): string {
   const now = new Date();
-  const rawDiffMs = date.getTime() - now.getTime();
-  const diffMs = rawDiffMs > 0 ? -rawDiffMs : rawDiffMs;
+  const diffMs = Math.min(0, date.getTime() - now.getTime());
   const diffSecs = Math.round(diffMs / 1000);
   const diffMins = Math.round(diffSecs / 60);
   const diffHours = Math.round(diffMins / 60);

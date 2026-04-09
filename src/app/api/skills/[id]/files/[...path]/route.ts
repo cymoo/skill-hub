@@ -4,6 +4,7 @@ import { skills } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { readFile, writeFile } from "@/lib/storage";
 import { parseSkillMd } from "@/lib/skill-parser";
+import { filePathSchema } from "@/lib/validators";
 import { eq } from "drizzle-orm";
 
 export async function GET(
@@ -45,10 +46,11 @@ export async function PUT(
     const { id, path: pathSegments } = await params;
     const filePath = pathSegments.join("/");
 
-    // Validate path
-    if (filePath.includes("..")) {
+    const pathResult = filePathSchema.safeParse(filePath);
+    if (!pathResult.success) {
       return NextResponse.json({ error: "Invalid path" }, { status: 400 });
     }
+    const normalizedPath = pathResult.data;
 
     const [skill] = await db
       .select({ storagePath: skills.storagePath, ownerId: skills.ownerId })
@@ -74,10 +76,10 @@ export async function PUT(
       );
     }
 
-    await writeFile(skill.storagePath, filePath, content);
+    await writeFile(skill.storagePath, normalizedPath, content);
 
     // If updating SKILL.md, re-parse and update DB
-    if (filePath === "SKILL.md") {
+    if (normalizedPath === "SKILL.md") {
       try {
         const metadata = parseSkillMd(content);
         await db

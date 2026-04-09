@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { skills } from "@/db/schema";
 import { createDirectory, getSkillFullPath, listDirectory, writeFile } from "@/lib/storage";
 import { getCurrentUser } from "@/lib/auth";
+import { filePathSchema } from "@/lib/validators";
 import { eq } from "drizzle-orm";
 
 export async function GET(
@@ -67,22 +68,19 @@ export async function POST(
     const body = await request.json();
     const { path, type } = body as { path?: string; type?: "file" | "directory" };
 
-    if (
-      !path ||
-      typeof path !== "string" ||
-      path.includes("..") ||
-      path.startsWith("/")
-    ) {
+    const pathResult = filePathSchema.safeParse(path);
+    if (!pathResult.success) {
       return NextResponse.json({ error: "Invalid path" }, { status: 400 });
     }
+    const normalizedPath = pathResult.data;
 
     if (type === "directory") {
-      await createDirectory(skill.storagePath, path);
+      await createDirectory(skill.storagePath, normalizedPath);
       return NextResponse.json({ success: true });
     }
 
     if (type === "file") {
-      await writeFile(skill.storagePath, path, "");
+      await writeFile(skill.storagePath, normalizedPath, "");
       return NextResponse.json({ success: true });
     }
 
