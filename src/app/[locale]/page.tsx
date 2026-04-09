@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,10 @@ export default function HomePage() {
   const [sort, setSort] = useState("created_at");
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
+  );
+  const totalStars = useMemo(
+    () => skills.reduce((sum, item) => sum + item.starCount, 0),
+    [skills]
   );
 
   const fetchSkills = useCallback(
@@ -202,7 +206,7 @@ export default function HomePage() {
                   {t("sortStars")}
                 </p>
                 <p className="mt-2 font-[family-name:var(--font-display)] text-3xl text-accent">
-                  {skills.reduce((sum, item) => sum + item.starCount, 0)}
+                  {totalStars}
                 </p>
               </div>
             </div>
