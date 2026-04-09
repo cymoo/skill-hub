@@ -16,23 +16,23 @@ export function slugify(text: string): string {
 
 export function formatRelativeTime(date: Date, locale: string = "en"): string {
   const now = new Date();
-  const diffMs = Math.min(0, date.getTime() - now.getTime());
-  const diffSecs = Math.round(diffMs / 1000);
-  const diffMins = Math.round(diffSecs / 60);
-  const diffHours = Math.round(diffMins / 60);
-  const diffDays = Math.round(diffHours / 24);
+  const diffMs = Math.max(0, now.getTime() - date.getTime());
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
 
-  if (Math.abs(diffDays) > 30) {
+  if (diffDays > 30) {
     return date.toLocaleDateString(locale);
-  } else if (Math.abs(diffDays) >= 1) {
-    return rtf.format(diffDays, "day");
-  } else if (Math.abs(diffHours) >= 1) {
-    return rtf.format(diffHours, "hour");
-  } else if (Math.abs(diffMins) >= 1) {
-    return rtf.format(diffMins, "minute");
+  } else if (diffDays >= 1) {
+    return rtf.format(-diffDays, "day");
+  } else if (diffHours >= 1) {
+    return rtf.format(-diffHours, "hour");
+  } else if (diffMins >= 1) {
+    return rtf.format(-diffMins, "minute");
   } else {
-    return rtf.format(diffSecs, "second");
+    return rtf.format(-diffSecs, "second");
   }
 }
