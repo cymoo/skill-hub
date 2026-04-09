@@ -350,6 +350,7 @@ export default function HomePage() {
                       <h3
                         className="font-[family-name:var(--font-display)] text-2xl leading-tight font-semibold group-hover:text-accent transition-colors line-clamp-1"
                         title={skill.name}
+                        aria-label={skill.name}
                       >
                         {skill.name}
                       </h3>
