@@ -58,6 +58,8 @@ export default function HomePage() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+  const totalSkillsLabel = locale === "zh" ? "总技能数" : "Total Skills";
+  const totalStarsLabel = locale === "zh" ? "总星标数" : "Total Stars";
   const totalStars = useMemo(
     () => skills.reduce((sum, item) => sum + item.starCount, 0),
     [skills]
@@ -195,7 +197,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="rounded-2xl border border-border bg-surface-raised p-4">
                 <p className="text-xs uppercase tracking-[0.16em] text-text-dim">
-                  {t("sortNewest")}
+                  {totalSkillsLabel}
                 </p>
                 <p className="mt-2 font-[family-name:var(--font-display)] text-3xl text-accent">
                   {total}
@@ -203,7 +205,7 @@ export default function HomePage() {
               </div>
               <div className="rounded-2xl border border-border bg-surface-raised p-4">
                 <p className="text-xs uppercase tracking-[0.16em] text-text-dim">
-                  {t("sortStars")}
+                  {totalStarsLabel}
                 </p>
                 <p className="mt-2 font-[family-name:var(--font-display)] text-3xl text-accent">
                   {totalStars}
