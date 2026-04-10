@@ -382,7 +382,11 @@ export default function SkillDetailPage({
       defaultName
     )?.trim();
     if (!inputName) return;
-    const validationError = validateFileNameInput(inputName, !parentPath);
+    const allowSlashForCreateName = !parentPath;
+    const validationError = validateFileNameInput(
+      inputName,
+      allowSlashForCreateName
+    );
     if (validationError) {
       toast({ title: t(validationError), variant: "destructive" });
       return;
@@ -431,7 +435,11 @@ export default function SkillDetailPage({
       currentName
     )?.trim();
     if (!newName || newName === currentName) return;
-    const renameValidationError = validateFileNameInput(newName, false);
+    const allowSlashForRenameName = false;
+    const renameValidationError = validateFileNameInput(
+      newName,
+      allowSlashForRenameName
+    );
     if (renameValidationError) {
       toast({ title: t(renameValidationError), variant: "destructive" });
       return;

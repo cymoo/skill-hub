@@ -40,7 +40,6 @@ export function formatRelativeTime(date: Date, locale: string = "en"): string {
   } else {
     const secValueForPastOrFuture = diffMs >= 0 ? Math.max(diffSecs, 1) : diffSecs;
     // Keep past timestamps from showing "0 seconds ago", while allowing future values like "now".
-    const secValue = secValueForPastOrFuture;
-    return rtf.format(rtfValue(secValue), "second");
+    return rtf.format(rtfValue(secValueForPastOrFuture), "second");
   }
 }
