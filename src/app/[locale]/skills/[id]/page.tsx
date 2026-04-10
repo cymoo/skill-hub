@@ -866,11 +866,12 @@ export default function SkillDetailPage({
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
                           className="w-full h-full min-h-[460px] p-4 bg-transparent font-[family-name:var(--font-mono)] text-sm leading-relaxed resize-none focus:outline-none"
+                          wrap="off"
                           spellCheck={false}
                         />
                       ) : (
                         <div className="p-4 min-w-0">
-                          <div className="prose max-w-none [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre [&_code]:whitespace-pre [&_code]:break-normal">
+                          <div className="prose max-w-none min-w-full [&_pre]:max-w-none [&_pre]:min-w-max [&_pre]:whitespace-pre [&_code]:whitespace-pre [&_code]:break-normal">
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               rehypePlugins={[rehypeSanitize, rehypeHighlight]}
@@ -1013,7 +1014,7 @@ function FileTreeItem({
       <div>
         <div
           className={cn(
-            "group flex items-center gap-1 py-1 rounded-md",
+            "group flex items-center gap-1 py-1 rounded-md min-w-0",
             selectedDirectory === path && "bg-accent/10"
           )}
           style={{
@@ -1025,7 +1026,7 @@ function FileTreeItem({
               setExpanded(!expanded);
               onSelectDirectory(path);
             }}
-            className="flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1.5 text-sm rounded-md hover:bg-surface-hover transition-colors text-left"
+            className="flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden px-2 py-1.5 text-sm rounded-md hover:bg-surface-hover transition-colors text-left"
           >
             <ChevronRight
               className={cn(
@@ -1038,10 +1039,12 @@ function FileTreeItem({
             ) : (
               <Folder className="h-4 w-4 text-accent shrink-0" />
             )}
-            <span className="truncate">{node.name}</span>
+            <span className="min-w-0 flex-1 truncate" title={node.name}>
+              {node.name}
+            </span>
           </button>
           {isOwner && (
-            <div className="flex items-center gap-0.5 pr-1">
+            <div className="flex shrink-0 items-center gap-0.5 pr-1">
               <Button
                 variant="ghost"
                 size="icon"
@@ -1105,7 +1108,7 @@ function FileTreeItem({
 
   return (
     <div
-      className="group flex items-center gap-1"
+      className="group flex items-center gap-1 min-w-0"
       style={{
         paddingLeft: `${depth * FILE_TREE_INDENT_PER_LEVEL + FILE_TREE_BASE_FILE_INDENT}px`,
       }}
@@ -1113,17 +1116,19 @@ function FileTreeItem({
       <button
         onClick={() => onSelect(path)}
         className={cn(
-          "flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1.5 text-sm rounded-md transition-colors text-left",
+          "flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden px-2 py-1.5 text-sm rounded-md transition-colors text-left",
           selectedFile === path
             ? "bg-accent/10 text-accent"
             : "hover:bg-surface-hover text-text-muted hover:text-text"
         )}
       >
         <FileText className="h-4 w-4 shrink-0" />
-        <span className="truncate">{node.name}</span>
+        <span className="min-w-0 flex-1 truncate" title={node.name}>
+          {node.name}
+        </span>
       </button>
       {isOwner && (
-        <div className="flex items-center gap-0.5 pr-1">
+        <div className="flex shrink-0 items-center gap-0.5 pr-1">
           <Button
             variant="ghost"
             size="icon"
