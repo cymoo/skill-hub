@@ -15,7 +15,7 @@ import { z } from "zod/v4";
 const createSchema = z.object({
   name: skillNameSchema,
   description: z.string().min(1, "Description is required").max(1024),
-  customDescription: z.string().max(1024).optional(),
+  customDescription: z.string().max(1024).nullish(),
   categoryId: z.number().optional(),
 });
 

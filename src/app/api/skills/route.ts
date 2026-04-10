@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
       conditions.push(
         or(
           ilike(skills.name, `%${search}%`),
-          ilike(skills.customDescription, `%${search}%`),
+          ilike(
+            sql<string>`coalesce(${skills.customDescription}, '')`,
+            `%${search}%`
+          ),
           ilike(skills.description, `%${search}%`)
         )
       );
