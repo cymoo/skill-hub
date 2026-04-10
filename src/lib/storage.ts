@@ -82,7 +82,7 @@ export async function renameEntry(
 
   await fs.access(oldFullPath);
   if (await exists(newFullPath)) {
-    throw new Error("Target path already exists");
+    throw new Error(`Target path already exists: ${newPath}`);
   }
 
   await ensureDir(path.dirname(newFullPath));

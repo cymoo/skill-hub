@@ -146,6 +146,8 @@ export default function SkillDetailPage({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const toRoutePath = (filePath: string) =>
+    filePath.split("/").map(encodeURIComponent).join("/");
 
   useEffect(() => {
     const fetchSkill = async () => {
@@ -269,7 +271,7 @@ export default function SkillDetailPage({
     setIsEditing(false);
 
     try {
-      const res = await fetch(`/api/skills/${id}/files/${filePath}`);
+      const res = await fetch(`/api/skills/${id}/files/${toRoutePath(filePath)}`);
       const data = await res.json();
       setFileContent(data.content || "");
     } catch {
@@ -282,7 +284,7 @@ export default function SkillDetailPage({
     setSaving(true);
 
     try {
-      const res = await fetch(`/api/skills/${id}/files/${selectedFile}`, {
+      const res = await fetch(`/api/skills/${id}/files/${toRoutePath(selectedFile)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: editContent }),
@@ -356,6 +358,19 @@ export default function SkillDetailPage({
       defaultName
     )?.trim();
     if (!inputName) return;
+    if (
+      inputName.includes("..") ||
+      inputName.includes("\\") ||
+      inputName.includes("\0") ||
+      inputName.startsWith("/")
+    ) {
+      toast({ title: tc("error"), variant: "destructive" });
+      return;
+    }
+    if (parentPath && inputName.includes("/")) {
+      toast({ title: tc("error"), variant: "destructive" });
+      return;
+    }
 
     const inputPath = parentPath ? `${parentPath}/${inputName}` : inputName;
 
@@ -400,6 +415,15 @@ export default function SkillDetailPage({
       currentName
     )?.trim();
     if (!newName || newName === currentName) return;
+    if (
+      newName.includes("/") ||
+      newName.includes("\\") ||
+      newName.includes("..") ||
+      newName.includes("\0")
+    ) {
+      toast({ title: tc("error"), variant: "destructive" });
+      return;
+    }
 
     const nextPath = parentPath ? `${parentPath}/${newName}` : newName;
     const shouldRename = confirm(
@@ -411,7 +435,7 @@ export default function SkillDetailPage({
     if (!shouldRename) return;
 
     try {
-      const res = await fetch(`/api/skills/${id}/files/${currentPath}`, {
+      const res = await fetch(`/api/skills/${id}/files/${toRoutePath(currentPath)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ newPath: nextPath }),
@@ -425,14 +449,14 @@ export default function SkillDetailPage({
       if (selectedFile === currentPath) {
         setSelectedFile(nextPath);
       } else if (selectedFile.startsWith(`${currentPath}/`)) {
-        setSelectedFile(selectedFile.replace(`${currentPath}/`, `${nextPath}/`));
+        setSelectedFile(`${nextPath}/${selectedFile.slice(currentPath.length + 1)}`);
       }
 
       if (selectedDirectory === currentPath) {
         setSelectedDirectory(nextPath);
       } else if (selectedDirectory.startsWith(`${currentPath}/`)) {
         setSelectedDirectory(
-          selectedDirectory.replace(`${currentPath}/`, `${nextPath}/`)
+          `${nextPath}/${selectedDirectory.slice(currentPath.length + 1)}`
         );
       }
 
@@ -457,7 +481,7 @@ export default function SkillDetailPage({
     if (!shouldDelete) return;
 
     try {
-      const res = await fetch(`/api/skills/${id}/files/${targetPath}`, {
+      const res = await fetch(`/api/skills/${id}/files/${toRoutePath(targetPath)}`, {
         method: "DELETE",
       });
       const data = await res.json();

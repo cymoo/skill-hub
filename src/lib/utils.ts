@@ -38,9 +38,6 @@ export function formatRelativeTime(date: Date, locale: string = "en"): string {
   } else if (diffMins >= 1) {
     return rtf.format(rtfValue(diffMins), "minute");
   } else {
-    if (diffSecs === 0) {
-      return rtf.format(0, "second");
-    }
-    return rtf.format(rtfValue(diffSecs), "second");
+    return rtf.format(rtfValue(Math.max(diffSecs, 1)), "second");
   }
 }
