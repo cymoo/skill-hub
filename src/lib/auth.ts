@@ -8,6 +8,10 @@ const JWT_SECRET = new TextEncoder().encode(
 
 const COOKIE_NAME = "skill-hub-token";
 
+/**
+ * Minimal request context used to determine whether auth cookies should be
+ * marked as secure when they are set in Route Handlers.
+ */
 interface AuthCookieRequestContext {
   nextUrl?: {
     protocol?: string;
@@ -49,6 +53,8 @@ export async function comparePassword(
 }
 
 function shouldUseSecureCookie(request?: AuthCookieRequestContext): boolean {
+  // Detection order: x-forwarded-proto (proxy) -> request URL protocol ->
+  // NEXT_PUBLIC_APP_URL protocol -> NODE_ENV fallback.
   const forwardedProto = request?.headers
     ?.get("x-forwarded-proto")
     ?.split(",")[0]
@@ -62,11 +68,7 @@ function shouldUseSecureCookie(request?: AuthCookieRequestContext): boolean {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (appUrl) {
-    try {
-      return new URL(appUrl).protocol === "https:";
-    } catch {
-      // Ignore invalid URL format and fall back to NODE_ENV.
-    }
+    return appUrl.trim().toLowerCase().startsWith("https://");
   }
 
   return process.env.NODE_ENV === "production";

@@ -53,7 +53,7 @@ An open platform for uploading, managing, sharing, and discovering AI Agent Skil
    MAX_ZIP_SIZE_MB=50
    NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
-   The `NEXT_PUBLIC_APP_URL` protocol affects the auth cookie `secure` flag: `https://` enables `secure`, while `http://` disables it.
+   The auth cookie `secure` flag is resolved in this order: `x-forwarded-proto` (proxy) → current request protocol → `NEXT_PUBLIC_APP_URL` protocol → `NODE_ENV` fallback. For `NEXT_PUBLIC_APP_URL`, `https://` enables `secure`, while `http://` disables it.
 
 3. **Create the database:**
    ```bash
