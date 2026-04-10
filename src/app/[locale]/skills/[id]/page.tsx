@@ -753,7 +753,7 @@ export default function SkillDetailPage({
         {/* Files Tab */}
         <TabsContent value="files">
           <div className="rounded-xl border border-border bg-surface overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[500px]">
+            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[600px]">
               {/* File Tree */}
               <div className="border-r border-border bg-surface">
                 <div className="p-3 border-b border-border flex items-center justify-between gap-2">
@@ -783,7 +783,7 @@ export default function SkillDetailPage({
                     </div>
                   )}
                 </div>
-                <ScrollArea className="h-[500px]">
+                <ScrollArea className="h-[600px]">
                   <div className="p-2">
                     {fileTree?.children?.map((node) => (
                       <FileTreeItem
@@ -860,12 +860,12 @@ export default function SkillDetailPage({
                         </div>
                       )}
                     </div>
-                    <ScrollArea className="h-[460px]">
+                    <ScrollArea className="h-[560px]">
                       {isEditing ? (
                         <textarea
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
-                          className="w-full h-full min-h-[460px] p-4 bg-transparent font-[family-name:var(--font-mono)] text-sm leading-relaxed resize-none focus:outline-none"
+                          className="w-full h-full min-h-[560px] p-4 bg-transparent font-[family-name:var(--font-mono)] text-sm leading-relaxed resize-none focus:outline-none"
                           wrap="off"
                           spellCheck={false}
                         />
@@ -884,7 +884,7 @@ export default function SkillDetailPage({
                     </ScrollArea>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-[500px] text-text-dim">
+                  <div className="flex items-center justify-center h-[600px] text-text-dim">
                     <div className="text-center">
                       <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
                       <p>{t("fileContent")}</p>
