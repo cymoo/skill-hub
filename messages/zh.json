@@ -77,8 +77,19 @@
     "loginToStar": "登录后可收藏此技能",
     "createFile": "创建文件",
     "createFolder": "创建文件夹",
+    "rename": "重命名",
     "newFilePath": "请输入新文件路径（例如 docs/guide.md）：",
-    "newFolderPath": "请输入新文件夹路径（例如 docs/examples）："
+    "newFolderPath": "请输入新文件夹路径（例如 docs/examples）：",
+    "newFileName": "请输入新文件名：",
+    "newFolderName": "请输入新文件夹名：",
+    "createInPathPrompt": "将在 {path} 下创建，请输入名称：",
+    "renameFilePrompt": "请输入新的文件名：",
+    "renameFolderPrompt": "请输入新的文件夹名：",
+    "renameConfirm": "确定将 {from} 重命名为 {to} 吗？",
+    "deleteFileConfirm": "确定删除文件 {path} 吗？",
+    "deleteFolderConfirm": "确定删除文件夹 {path} 及其全部内容吗？",
+    "invalidNameInput": "名称不合法，请勿使用 /、\\、.. 或空字符。",
+    "slashNotAllowedInName": "此处只需输入名称，不要输入多级路径。"
   },
   "dashboard": {
     "title": "我的控制台",

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { skills } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
-import { readFile, writeFile } from "@/lib/storage";
+import { deleteEntry, readFile, renameEntry, writeFile } from "@/lib/storage";
 import { parseSkillMd } from "@/lib/skill-parser";
 import { filePathSchema } from "@/lib/validators";
 import { eq } from "drizzle-orm";
@@ -100,6 +100,101 @@ export async function PUT(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Write file error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string; path: string[] }> }
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id, path: pathSegments } = await params;
+    const oldPath = pathSegments.join("/");
+
+    const oldPathResult = filePathSchema.safeParse(oldPath);
+    if (!oldPathResult.success) {
+      return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const { newPath } = body as { newPath?: string };
+
+    const newPathResult = filePathSchema.safeParse(newPath);
+    if (!newPathResult.success) {
+      return NextResponse.json({ error: "Invalid new path" }, { status: 400 });
+    }
+
+    const [skill] = await db
+      .select({ storagePath: skills.storagePath, ownerId: skills.ownerId })
+      .from(skills)
+      .where(eq(skills.id, id))
+      .limit(1);
+
+    if (!skill) {
+      return NextResponse.json({ error: "Skill not found" }, { status: 404 });
+    }
+
+    if (skill.ownerId !== user.userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await renameEntry(skill.storagePath, oldPathResult.data, newPathResult.data);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Rename file or directory error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string; path: string[] }> }
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id, path: pathSegments } = await params;
+    const targetPath = pathSegments.join("/");
+
+    const pathResult = filePathSchema.safeParse(targetPath);
+    if (!pathResult.success) {
+      return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+    }
+
+    const [skill] = await db
+      .select({ storagePath: skills.storagePath, ownerId: skills.ownerId })
+      .from(skills)
+      .where(eq(skills.id, id))
+      .limit(1);
+
+    if (!skill) {
+      return NextResponse.json({ error: "Skill not found" }, { status: 404 });
+    }
+
+    if (skill.ownerId !== user.userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await deleteEntry(skill.storagePath, pathResult.data);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete file or directory error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

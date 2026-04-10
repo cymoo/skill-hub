@@ -56,6 +56,44 @@ export async function deleteFile(
   await fs.unlink(fullPath);
 }
 
+export async function deleteEntry(
+  skillPath: string,
+  targetPath: string
+): Promise<void> {
+  const fullPath = sanitizePath(getSkillFullPath(skillPath), targetPath);
+  let stat: Awaited<ReturnType<typeof fs.stat>>;
+  try {
+    stat = await fs.stat(fullPath);
+  } catch {
+    throw new Error(`Path not found: ${targetPath}`);
+  }
+
+  if (stat.isDirectory()) {
+    await fs.rm(fullPath, { recursive: true, force: true });
+    return;
+  }
+
+  await fs.unlink(fullPath);
+}
+
+export async function renameEntry(
+  skillPath: string,
+  oldPath: string,
+  newPath: string
+): Promise<void> {
+  const basePath = getSkillFullPath(skillPath);
+  const oldFullPath = sanitizePath(basePath, oldPath);
+  const newFullPath = sanitizePath(basePath, newPath);
+
+  await fs.access(oldFullPath);
+  if (await exists(newFullPath)) {
+    throw new Error(`Target path already exists: ${newPath}`);
+  }
+
+  await ensureDir(path.dirname(newFullPath));
+  await fs.rename(oldFullPath, newFullPath);
+}
+
 export async function listDirectory(
   dirPath: string
 ): Promise<FileTreeNode[]> {
