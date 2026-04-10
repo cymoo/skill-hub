@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { skills, users, categories, stars } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { getSkillFullPath, deleteDirectory } from "@/lib/storage";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export async function GET(
   _request: NextRequest,
@@ -16,7 +16,12 @@ export async function GET(
       .select({
         id: skills.id,
         name: skills.name,
-        description: skills.description,
+        description:
+          sql<string>`coalesce(${skills.customDescription}, ${skills.description})`.as(
+            "description"
+          ),
+        customDescription: skills.customDescription,
+        metadataDescription: skills.description,
         starCount: skills.starCount,
         downloadCount: skills.downloadCount,
         license: skills.license,
@@ -123,8 +128,19 @@ export async function PATCH(
         );
       }
     }
-    if (body.description !== undefined) {
-      updates.description = body.description;
+    const customDescriptionInput = body.customDescription;
+    if (customDescriptionInput !== undefined) {
+      if (customDescriptionInput === null) {
+        updates.customDescription = null;
+      } else if (typeof customDescriptionInput === "string") {
+        const trimmed = customDescriptionInput.trim();
+        updates.customDescription = trimmed.length > 0 ? trimmed : null;
+      } else {
+        return NextResponse.json(
+          { error: "Invalid customDescription" },
+          { status: 400 }
+        );
+      }
     }
 
     updates.updatedAt = new Date();

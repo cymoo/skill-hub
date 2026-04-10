@@ -35,6 +35,7 @@ export const skills = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     name: varchar("name", { length: 64 }).notNull(),
     description: text("description").notNull(),
+    customDescription: text("custom_description"),
     categoryId: integer("category_id").references(() => categories.id, { onDelete: "set null" }),
     ownerId: uuid("owner_id")
       .references(() => users.id, { onDelete: "cascade" })

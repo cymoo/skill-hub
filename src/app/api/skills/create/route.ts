@@ -15,6 +15,7 @@ import { z } from "zod/v4";
 const createSchema = z.object({
   name: skillNameSchema,
   description: z.string().min(1, "Description is required").max(1024),
+  customDescription: z.string().max(1024).nullish(),
   categoryId: z.number().optional(),
 });
 
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, description, categoryId } = result.data;
+    const { name, description, customDescription, categoryId } = result.data;
 
     // Check duplicate
     const existing = await db
@@ -93,6 +94,10 @@ Add your instructions here...
       .values({
         name,
         description,
+        customDescription:
+          customDescription && customDescription.trim().length > 0
+            ? customDescription.trim()
+            : null,
         categoryId: catId,
         ownerId: user.userId,
         storagePath,

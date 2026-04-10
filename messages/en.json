@@ -89,7 +89,11 @@
     "deleteFileConfirm": "Are you sure you want to delete file {path}?",
     "deleteFolderConfirm": "Are you sure you want to delete folder {path} and all its contents?",
     "invalidNameInput": "Invalid name. Do not use /, \\, .. or null characters.",
-    "slashNotAllowedInName": "Please enter only a name here, not a nested path."
+    "slashNotAllowedInName": "Please enter only a name here, not a nested path.",
+    "customSummary": "Custom summary",
+    "customSummaryPlaceholder": "Set a custom summary for skill cards...",
+    "customSummaryHint": "If left empty, the summary automatically falls back to SKILL.md metadata description.",
+    "saveSummary": "Save summary"
   },
   "dashboard": {
     "title": "My Dashboard",
