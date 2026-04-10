@@ -87,7 +87,9 @@
     "renameFolderPrompt": "请输入新的文件夹名：",
     "renameConfirm": "确定将 {from} 重命名为 {to} 吗？",
     "deleteFileConfirm": "确定删除文件 {path} 吗？",
-    "deleteFolderConfirm": "确定删除文件夹 {path} 及其全部内容吗？"
+    "deleteFolderConfirm": "确定删除文件夹 {path} 及其全部内容吗？",
+    "invalidNameInput": "名称不合法，请勿使用 /、\\、.. 或空字符。",
+    "slashNotAllowedInName": "此处只需输入名称，不要输入多级路径。"
   },
   "dashboard": {
     "title": "我的控制台",

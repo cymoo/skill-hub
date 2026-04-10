@@ -364,11 +364,11 @@ export default function SkillDetailPage({
       inputName.includes("\0") ||
       inputName.startsWith("/")
     ) {
-      toast({ title: tc("error"), variant: "destructive" });
+      toast({ title: t("invalidNameInput"), variant: "destructive" });
       return;
     }
     if (parentPath && inputName.includes("/")) {
-      toast({ title: tc("error"), variant: "destructive" });
+      toast({ title: t("slashNotAllowedInName"), variant: "destructive" });
       return;
     }
 
@@ -421,7 +421,7 @@ export default function SkillDetailPage({
       newName.includes("..") ||
       newName.includes("\0")
     ) {
-      toast({ title: tc("error"), variant: "destructive" });
+      toast({ title: t("invalidNameInput"), variant: "destructive" });
       return;
     }
 

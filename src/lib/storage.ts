@@ -61,7 +61,12 @@ export async function deleteEntry(
   targetPath: string
 ): Promise<void> {
   const fullPath = sanitizePath(getSkillFullPath(skillPath), targetPath);
-  const stat = await fs.stat(fullPath);
+  let stat: Awaited<ReturnType<typeof fs.stat>>;
+  try {
+    stat = await fs.stat(fullPath);
+  } catch {
+    throw new Error(`Path not found: ${targetPath}`);
+  }
 
   if (stat.isDirectory()) {
     await fs.rm(fullPath, { recursive: true, force: true });

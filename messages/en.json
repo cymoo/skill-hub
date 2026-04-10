@@ -87,7 +87,9 @@
     "renameFolderPrompt": "Enter new folder name:",
     "renameConfirm": "Are you sure you want to rename {from} to {to}?",
     "deleteFileConfirm": "Are you sure you want to delete file {path}?",
-    "deleteFolderConfirm": "Are you sure you want to delete folder {path} and all its contents?"
+    "deleteFolderConfirm": "Are you sure you want to delete folder {path} and all its contents?",
+    "invalidNameInput": "Invalid name. Do not use /, \\, .. or null characters.",
+    "slashNotAllowedInName": "Please enter only a name here, not a nested path."
   },
   "dashboard": {
     "title": "My Dashboard",
