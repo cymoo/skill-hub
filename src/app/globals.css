@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #f6f3ed;
+  --color-bg: #fafaf9;
   --color-surface: #ffffff;
-  --color-surface-hover: #f7f1e7;
-  --color-surface-raised: #fffcf7;
-  --color-accent: #8f571f;
-  --color-accent-hover: #754417;
-  --color-accent-muted: #d7b383;
-  --color-on-solid: #fffaf2;
-  --color-text: #2f2218;
-  --color-text-muted: #6c5a4b;
-  --color-text-dim: #907a66;
-  --color-border: #dfd1bf;
-  --color-border-hover: #cab394;
-  --color-danger: #d54e42;
-  --color-danger-hover: #bd4035;
-  --color-success: #2d8e60;
+  --color-surface-hover: #f4f3f1;
+  --color-surface-raised: #ffffff;
+  --color-accent: #197a64;
+  --color-accent-hover: #105a4a;
+  --color-accent-muted: #8abcb4;
+  --color-on-solid: #f0faf7;
+  --color-text: #1a2e2a;
+  --color-text-muted: #4a6460;
+  --color-text-dim: #7a9a94;
+  --color-border: #d0e4e0;
+  --color-border-hover: #8abcb4;
+  --color-danger: #c44040;
+  --color-danger-hover: #a43030;
+  --color-success: #197a64;
 
   --font-display: "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
   --font-body: system-ui, "Segoe UI", "Trebuchet MS", "Tahoma", sans-serif;
