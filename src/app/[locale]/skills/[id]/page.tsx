@@ -1026,7 +1026,7 @@ function FileTreeItem({
               setExpanded(!expanded);
               onSelectDirectory(path);
             }}
-            className="flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden px-2 py-1.5 text-sm rounded-md hover:bg-surface-hover transition-colors text-left"
+            className="flex w-0 items-center gap-1.5 flex-1 min-w-0 overflow-hidden px-2 py-1.5 text-sm rounded-md hover:bg-surface-hover transition-colors text-left"
           >
             <ChevronRight
               className={cn(
@@ -1039,7 +1039,7 @@ function FileTreeItem({
             ) : (
               <Folder className="h-4 w-4 text-accent shrink-0" />
             )}
-            <span className="min-w-0 flex-1 truncate" title={node.name}>
+            <span className="block min-w-0 flex-1 truncate" title={node.name}>
               {node.name}
             </span>
           </button>
@@ -1116,14 +1116,14 @@ function FileTreeItem({
       <button
         onClick={() => onSelect(path)}
         className={cn(
-          "flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden px-2 py-1.5 text-sm rounded-md transition-colors text-left",
+          "flex w-0 items-center gap-1.5 flex-1 min-w-0 overflow-hidden px-2 py-1.5 text-sm rounded-md transition-colors text-left",
           selectedFile === path
             ? "bg-accent/10 text-accent"
             : "hover:bg-surface-hover text-text-muted hover:text-text"
         )}
       >
         <FileText className="h-4 w-4 shrink-0" />
-        <span className="min-w-0 flex-1 truncate" title={node.name}>
+        <span className="block min-w-0 flex-1 truncate" title={node.name}>
           {node.name}
         </span>
       </button>
