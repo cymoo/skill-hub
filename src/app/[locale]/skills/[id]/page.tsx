@@ -123,6 +123,30 @@ function getLanguageFromPath(filePath: string): string {
   return map[extension] || "plaintext";
 }
 
+function replacePathPrefix(path: string, oldPrefix: string, newPrefix: string): string {
+  if (path === oldPrefix) return newPrefix;
+  if (!path.startsWith(`${oldPrefix}/`)) return path;
+  return `${newPrefix}/${path.slice(oldPrefix.length + 1)}`;
+}
+
+function validateFileNameInput(
+  name: string,
+  allowSlash: boolean
+): "invalidNameInput" | "slashNotAllowedInName" | null {
+  if (
+    name.includes("..") ||
+    name.includes("\\") ||
+    name.includes("\0") ||
+    name.startsWith("/")
+  ) {
+    return "invalidNameInput";
+  }
+  if (!allowSlash && name.includes("/")) {
+    return "slashNotAllowedInName";
+  }
+  return null;
+}
+
 export default function SkillDetailPage({
   params,
 }: {
@@ -358,17 +382,9 @@ export default function SkillDetailPage({
       defaultName
     )?.trim();
     if (!inputName) return;
-    if (
-      inputName.includes("..") ||
-      inputName.includes("\\") ||
-      inputName.includes("\0") ||
-      inputName.startsWith("/")
-    ) {
-      toast({ title: t("invalidNameInput"), variant: "destructive" });
-      return;
-    }
-    if (parentPath && inputName.includes("/")) {
-      toast({ title: t("slashNotAllowedInName"), variant: "destructive" });
+    const validationError = validateFileNameInput(inputName, !parentPath);
+    if (validationError) {
+      toast({ title: t(validationError), variant: "destructive" });
       return;
     }
 
@@ -415,13 +431,9 @@ export default function SkillDetailPage({
       currentName
     )?.trim();
     if (!newName || newName === currentName) return;
-    if (
-      newName.includes("/") ||
-      newName.includes("\\") ||
-      newName.includes("..") ||
-      newName.includes("\0")
-    ) {
-      toast({ title: t("invalidNameInput"), variant: "destructive" });
+    const renameValidationError = validateFileNameInput(newName, false);
+    if (renameValidationError) {
+      toast({ title: t(renameValidationError), variant: "destructive" });
       return;
     }
 
@@ -446,19 +458,8 @@ export default function SkillDetailPage({
         return;
       }
 
-      if (selectedFile === currentPath) {
-        setSelectedFile(nextPath);
-      } else if (selectedFile.startsWith(`${currentPath}/`)) {
-        setSelectedFile(`${nextPath}/${selectedFile.slice(currentPath.length + 1)}`);
-      }
-
-      if (selectedDirectory === currentPath) {
-        setSelectedDirectory(nextPath);
-      } else if (selectedDirectory.startsWith(`${currentPath}/`)) {
-        setSelectedDirectory(
-          `${nextPath}/${selectedDirectory.slice(currentPath.length + 1)}`
-        );
-      }
+      setSelectedFile((prev) => replacePathPrefix(prev, currentPath, nextPath));
+      setSelectedDirectory((prev) => replacePathPrefix(prev, currentPath, nextPath));
 
       await refreshFileTree();
       toast({ title: tc("success"), variant: "success" });
