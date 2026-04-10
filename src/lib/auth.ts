@@ -65,7 +65,7 @@ function shouldUseSecureCookie(request?: AuthCookieRequestContext): boolean {
     try {
       return new URL(appUrl).protocol === "https:";
     } catch {
-      // Ignore invalid URL format and fallback to NODE_ENV.
+      // Ignore invalid URL format and fall back to NODE_ENV.
     }
   }
 
