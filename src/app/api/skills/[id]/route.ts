@@ -128,10 +128,7 @@ export async function PATCH(
         );
       }
     }
-    const customDescriptionInput =
-      body.customDescription !== undefined
-        ? body.customDescription
-        : body.description;
+    const customDescriptionInput = body.customDescription;
     if (customDescriptionInput !== undefined) {
       if (customDescriptionInput === null) {
         updates.customDescription = null;
