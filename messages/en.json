@@ -93,7 +93,8 @@
     "customSummary": "Custom summary",
     "customSummaryPlaceholder": "Set a custom summary for skill cards...",
     "customSummaryHint": "If left empty, the summary automatically falls back to SKILL.md metadata description.",
-    "saveSummary": "Save summary"
+    "saveSummary": "Save summary",
+    "editSummary": "Edit summary"
   },
   "dashboard": {
     "title": "My Dashboard",

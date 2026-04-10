@@ -43,6 +43,13 @@ import {
   FolderPlus,
   Trash2,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -173,6 +180,7 @@ export default function SkillDetailPage({
   const [saving, setSaving] = useState(false);
   const [summaryDraft, setSummaryDraft] = useState("");
   const [summarySaving, setSummarySaving] = useState(false);
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const toRoutePath = (filePath: string) =>
     filePath.split("/").map(encodeURIComponent).join("/");
@@ -398,6 +406,7 @@ export default function SkillDetailPage({
         customDescription: nextCustomDescription,
         description: nextCustomDescription ?? skill.metadataDescription,
       });
+      setSummaryModalOpen(false);
       toast({ title: tc("success"), variant: "success" });
     } catch {
       toast({ title: tc("error"), variant: "destructive" });
@@ -673,26 +682,30 @@ export default function SkillDetailPage({
               </Select>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-text-muted">
-                {t("customSummary")}
-              </p>
-              <textarea
-                value={summaryDraft}
-                onChange={(e) => setSummaryDraft(e.target.value)}
-                placeholder={t("customSummaryPlaceholder")}
-                className="w-full min-h-24 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent/40"
-              />
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs text-text-dim">{t("customSummaryHint")}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-medium text-text-muted">
+                  {t("customSummary")}:
+                </p>
+                {skill.customDescription ? (
+                  <p className="text-sm text-text-muted flex-1 min-w-0 truncate italic">
+                    {skill.customDescription}
+                  </p>
+                ) : (
+                  <p className="text-sm text-text-dim flex-1 min-w-0 truncate">
+                    {t("customSummaryPlaceholder")}
+                  </p>
+                )}
                 <Button
+                  variant="ghost"
                   size="sm"
-                  onClick={handleSaveSummary}
-                  disabled={summarySaving}
+                  className="gap-1.5 shrink-0"
+                  onClick={() => {
+                    setSummaryDraft(skill.customDescription || "");
+                    setSummaryModalOpen(true);
+                  }}
                 >
-                  {summarySaving && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                  )}
-                  {t("saveSummary")}
+                  <Pencil className="h-3.5 w-3.5" />
+                  {t("editSummary")}
                 </Button>
               </div>
             </div>
@@ -798,7 +811,7 @@ export default function SkillDetailPage({
               </div>
 
               {/* File Content */}
-              <div className="flex flex-col">
+              <div className="flex flex-col min-w-0 overflow-hidden">
                 {selectedFile ? (
                   <>
                     <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-surface-raised/50 min-w-0">
@@ -921,6 +934,42 @@ export default function SkillDetailPage({
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Custom Summary Modal */}
+      <Dialog
+        open={summaryModalOpen}
+        onOpenChange={(open) => {
+          if (!open) setSummaryModalOpen(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("customSummary")}</DialogTitle>
+            <DialogDescription>{t("customSummaryHint")}</DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={summaryDraft}
+            onChange={(e) => setSummaryDraft(e.target.value)}
+            placeholder={t("customSummaryPlaceholder")}
+            className="w-full min-h-28 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent/40"
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSummaryModalOpen(false)}
+              disabled={summarySaving}
+            >
+              {tc("cancel")}
+            </Button>
+            <Button onClick={handleSaveSummary} disabled={summarySaving}>
+              {summarySaving && (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+              )}
+              {t("saveSummary")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

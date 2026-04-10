@@ -93,7 +93,8 @@
     "customSummary": "自定义简介",
     "customSummaryPlaceholder": "为技能卡片设置自定义简介...",
     "customSummaryHint": "留空时会自动回退为 SKILL.md metadata 中的 description。",
-    "saveSummary": "保存简介"
+    "saveSummary": "保存简介",
+    "editSummary": "编辑简介"
   },
   "dashboard": {
     "title": "我的控制台",
