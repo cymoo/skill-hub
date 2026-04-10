@@ -8,6 +8,13 @@ const JWT_SECRET = new TextEncoder().encode(
 
 const COOKIE_NAME = "skill-hub-token";
 
+interface AuthCookieRequestContext {
+  nextUrl?: {
+    protocol?: string;
+  };
+  headers?: Headers;
+}
+
 export interface JWTPayload {
   userId: string;
   username: string;
@@ -41,11 +48,38 @@ export async function comparePassword(
   return compare(password, hashedPassword);
 }
 
-export async function setAuthCookie(token: string) {
+function shouldUseSecureCookie(request?: AuthCookieRequestContext): boolean {
+  const forwardedProto = request?.headers
+    ?.get("x-forwarded-proto")
+    ?.split(",")[0]
+    ?.trim()
+    ?.toLowerCase();
+  if (forwardedProto) return forwardedProto === "https";
+
+  if (request?.nextUrl?.protocol) {
+    return request.nextUrl.protocol === "https:";
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (appUrl) {
+    try {
+      return new URL(appUrl).protocol === "https:";
+    } catch {
+      // Ignore invalid URL format and fallback to NODE_ENV.
+    }
+  }
+
+  return process.env.NODE_ENV === "production";
+}
+
+export async function setAuthCookie(
+  token: string,
+  request?: AuthCookieRequestContext
+) {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(request),
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
