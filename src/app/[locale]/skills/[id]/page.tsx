@@ -403,7 +403,7 @@ export default function SkillDetailPage({
 
     const nextPath = parentPath ? `${parentPath}/${newName}` : newName;
     const shouldRename = confirm(
-      t(type === "file" ? "renameFileConfirm" : "renameFolderConfirm", {
+      t("renameConfirm", {
         from: currentPath,
         to: nextPath,
       })

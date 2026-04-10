@@ -85,8 +85,7 @@
     "createInPathPrompt": "将在 {path} 下创建，请输入名称：",
     "renameFilePrompt": "请输入新的文件名：",
     "renameFolderPrompt": "请输入新的文件夹名：",
-    "renameFileConfirm": "确定将 {from} 重命名为 {to} 吗？",
-    "renameFolderConfirm": "确定将 {from} 重命名为 {to} 吗？",
+    "renameConfirm": "确定将 {from} 重命名为 {to} 吗？",
     "deleteFileConfirm": "确定删除文件 {path} 吗？",
     "deleteFolderConfirm": "确定删除文件夹 {path} 及其全部内容吗？"
   },

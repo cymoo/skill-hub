@@ -85,8 +85,7 @@
     "createInPathPrompt": "Create in {path}. Please enter a name:",
     "renameFilePrompt": "Enter new file name:",
     "renameFolderPrompt": "Enter new folder name:",
-    "renameFileConfirm": "Are you sure you want to rename {from} to {to}?",
-    "renameFolderConfirm": "Are you sure you want to rename {from} to {to}?",
+    "renameConfirm": "Are you sure you want to rename {from} to {to}?",
     "deleteFileConfirm": "Are you sure you want to delete file {path}?",
     "deleteFolderConfirm": "Are you sure you want to delete folder {path} and all its contents?"
   },
