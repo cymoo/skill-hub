@@ -85,7 +85,7 @@ export async function renameEntry(
     await fs.access(newFullPath);
     throw new Error("Target path already exists");
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+    if (!isErrnoException(error) || error.code !== "ENOENT") {
       throw error;
     }
   }
@@ -137,4 +137,8 @@ export function getSkillFullPath(storagePath: string): string {
 
 export function generateStoragePath(userId: string, skillName: string): string {
   return `${userId}/${skillName}`;
+}
+
+function isErrnoException(error: unknown): error is NodeJS.ErrnoException {
+  return typeof error === "object" && error !== null && "code" in error;
 }

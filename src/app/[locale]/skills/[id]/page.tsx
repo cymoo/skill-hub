@@ -90,6 +90,10 @@ interface Category {
   slug: string;
 }
 
+const FILE_TREE_INDENT_PER_LEVEL = 16;
+const FILE_TREE_BASE_FOLDER_INDENT = 8;
+const FILE_TREE_BASE_FILE_INDENT = 26;
+
 function stripFrontmatter(content: string): string {
   if (!content.startsWith("---")) return content;
   return content.replace(/^---[\s\S]*?\n---\s*/m, "");
@@ -863,7 +867,9 @@ function FileTreeItem({
             "group flex items-center gap-1 py-1 rounded-md",
             selectedDirectory === path && "bg-accent/10"
           )}
-          style={{ paddingLeft: `${depth * 16 + 8}px` }}
+          style={{
+            paddingLeft: `${depth * FILE_TREE_INDENT_PER_LEVEL + FILE_TREE_BASE_FOLDER_INDENT}px`,
+          }}
         >
           <button
             onClick={() => {
@@ -949,7 +955,12 @@ function FileTreeItem({
   }
 
   return (
-    <div className="group flex items-center gap-1" style={{ paddingLeft: `${depth * 16 + 26}px` }}>
+    <div
+      className="group flex items-center gap-1"
+      style={{
+        paddingLeft: `${depth * FILE_TREE_INDENT_PER_LEVEL + FILE_TREE_BASE_FILE_INDENT}px`,
+      }}
+    >
       <button
         onClick={() => onSelect(path)}
         className={cn(
