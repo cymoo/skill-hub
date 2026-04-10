@@ -28,6 +28,12 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const categoryId = formData.get("categoryId") as string | null;
+    const customDescriptionInput = formData.get("description");
+    const customDescription =
+      typeof customDescriptionInput === "string" &&
+      customDescriptionInput.trim().length > 0
+        ? customDescriptionInput.trim()
+        : null;
 
     if (!file) {
       return NextResponse.json(
@@ -127,6 +133,7 @@ export async function POST(request: NextRequest) {
         .update(skills)
         .set({
           description: metadata.description,
+          customDescription,
           categoryId: catId,
           storagePath,
           license: metadata.license,
@@ -146,6 +153,7 @@ export async function POST(request: NextRequest) {
       .values({
         name: metadata.name,
         description: metadata.description,
+        customDescription,
         categoryId: catId,
         ownerId: user.userId,
         storagePath,

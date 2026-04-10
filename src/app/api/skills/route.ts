@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { skills, users, categories, stars } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { ITEMS_PER_PAGE } from "@/lib/constants";
-import { eq, desc, asc, ilike, or, and, count } from "drizzle-orm";
+import { eq, desc, asc, ilike, or, and, count, sql } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
       conditions.push(
         or(
           ilike(skills.name, `%${search}%`),
+          ilike(skills.customDescription, `%${search}%`),
           ilike(skills.description, `%${search}%`)
         )
       );
@@ -85,7 +86,10 @@ export async function GET(request: NextRequest) {
       .select({
         id: skills.id,
         name: skills.name,
-        description: skills.description,
+        description:
+          sql<string>`coalesce(${skills.customDescription}, ${skills.description})`.as(
+            "description"
+          ),
         starCount: skills.starCount,
         downloadCount: skills.downloadCount,
         license: skills.license,

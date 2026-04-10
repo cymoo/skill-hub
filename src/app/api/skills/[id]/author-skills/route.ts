@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { skills, users, categories } from "@/db/schema";
-import { eq, and, desc, ne } from "drizzle-orm";
+import { eq, and, desc, ne, sql } from "drizzle-orm";
 
 export async function GET(
   _request: NextRequest,
@@ -26,7 +26,10 @@ export async function GET(
       .select({
         id: skills.id,
         name: skills.name,
-        description: skills.description,
+        description:
+          sql<string>`coalesce(${skills.customDescription}, ${skills.description})`.as(
+            "description"
+          ),
         starCount: skills.starCount,
         downloadCount: skills.downloadCount,
         createdAt: skills.createdAt,

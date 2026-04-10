@@ -89,7 +89,11 @@
     "deleteFileConfirm": "确定删除文件 {path} 吗？",
     "deleteFolderConfirm": "确定删除文件夹 {path} 及其全部内容吗？",
     "invalidNameInput": "名称不合法，请勿使用 /、\\、.. 或空字符。",
-    "slashNotAllowedInName": "此处只需输入名称，不要输入多级路径。"
+    "slashNotAllowedInName": "此处只需输入名称，不要输入多级路径。",
+    "customSummary": "自定义简介",
+    "customSummaryPlaceholder": "为技能卡片设置自定义简介...",
+    "customSummaryHint": "留空时会自动回退为 SKILL.md metadata 中的 description。",
+    "saveSummary": "保存简介"
   },
   "dashboard": {
     "title": "我的控制台",

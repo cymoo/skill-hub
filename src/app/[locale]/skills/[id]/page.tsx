@@ -50,6 +50,8 @@ interface SkillDetail {
   id: string;
   name: string;
   description: string;
+  customDescription: string | null;
+  metadataDescription: string;
   starCount: number;
   downloadCount: number;
   license: string | null;
@@ -169,6 +171,8 @@ export default function SkillDetailPage({
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [summaryDraft, setSummaryDraft] = useState("");
+  const [summarySaving, setSummarySaving] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const toRoutePath = (filePath: string) =>
     filePath.split("/").map(encodeURIComponent).join("/");
@@ -186,6 +190,7 @@ export default function SkillDetailPage({
 
         if (skillData.skill) {
           setSkill(skillData.skill);
+          setSummaryDraft(skillData.skill.customDescription || "");
           if (meData.user) {
             setIsOwner(meData.user.id === skillData.skill.ownerId);
           }
@@ -365,6 +370,39 @@ export default function SkillDetailPage({
       toast({ title: tc("success"), variant: "success" });
     } catch {
       toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
+  const handleSaveSummary = async () => {
+    if (!skill || !isOwner) return;
+    setSummarySaving(true);
+
+    const trimmed = summaryDraft.trim();
+    const nextCustomDescription = trimmed.length > 0 ? trimmed : null;
+
+    try {
+      const res = await fetch(`/api/skills/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customDescription: nextCustomDescription }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        toast({ title: data.error || tc("error"), variant: "destructive" });
+        return;
+      }
+
+      setSkill({
+        ...skill,
+        customDescription: nextCustomDescription,
+        description: nextCustomDescription ?? skill.metadataDescription,
+      });
+      toast({ title: tc("success"), variant: "success" });
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    } finally {
+      setSummarySaving(false);
     }
   };
 
@@ -613,25 +651,51 @@ export default function SkillDetailPage({
           </span>
         </div>
         {isOwner && (
-          <div className="mt-4 w-full max-w-xs">
-            <Select
-              value={
-                skill.categoryId === null ? "__none__" : String(skill.categoryId)
-              }
-              onValueChange={handleUpdateCategory}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("category")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none__">{tc("all")}</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={String(cat.id)}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="mt-4 w-full max-w-2xl space-y-3">
+            <div className="w-full max-w-xs">
+              <Select
+                value={
+                  skill.categoryId === null ? "__none__" : String(skill.categoryId)
+                }
+                onValueChange={handleUpdateCategory}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t("category")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">{tc("all")}</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={String(cat.id)}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-text-muted">
+                {t("customSummary")}
+              </p>
+              <textarea
+                value={summaryDraft}
+                onChange={(e) => setSummaryDraft(e.target.value)}
+                placeholder={t("customSummaryPlaceholder")}
+                className="w-full min-h-24 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent/40"
+              />
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs text-text-dim">{t("customSummaryHint")}</p>
+                <Button
+                  size="sm"
+                  onClick={handleSaveSummary}
+                  disabled={summarySaving}
+                >
+                  {summarySaving && (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                  )}
+                  {t("saveSummary")}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -737,8 +801,11 @@ export default function SkillDetailPage({
               <div className="flex flex-col">
                 {selectedFile ? (
                   <>
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface-raised/50">
-                      <span className="text-sm font-mono text-text-muted">
+                    <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-surface-raised/50 min-w-0">
+                      <span
+                        className="min-w-0 flex-1 truncate text-sm font-mono text-text-muted"
+                        title={selectedFile}
+                      >
                         {selectedFile}
                       </span>
                       {isOwner && !isEditing && (
@@ -789,8 +856,8 @@ export default function SkillDetailPage({
                           spellCheck={false}
                         />
                       ) : (
-                        <div className="p-4">
-                          <div className="prose max-w-none">
+                        <div className="p-4 min-w-0">
+                          <div className="prose max-w-none [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre [&_code]:whitespace-pre [&_code]:break-normal">
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               rehypePlugins={[rehypeSanitize, rehypeHighlight]}
