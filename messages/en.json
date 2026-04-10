@@ -77,8 +77,18 @@
     "loginToStar": "Sign in to star this skill",
     "createFile": "Create file",
     "createFolder": "Create folder",
+    "rename": "Rename",
     "newFilePath": "Enter new file path (e.g. docs/guide.md):",
-    "newFolderPath": "Enter new folder path (e.g. docs/examples):"
+    "newFolderPath": "Enter new folder path (e.g. docs/examples):",
+    "newFileName": "Enter new file name:",
+    "newFolderName": "Enter new folder name:",
+    "createInPathPrompt": "Create in {path}. Please enter a name:",
+    "renameFilePrompt": "Enter new file name:",
+    "renameFolderPrompt": "Enter new folder name:",
+    "renameFileConfirm": "Are you sure you want to rename {from} to {to}?",
+    "renameFolderConfirm": "Are you sure you want to rename {from} to {to}?",
+    "deleteFileConfirm": "Are you sure you want to delete file {path}?",
+    "deleteFolderConfirm": "Are you sure you want to delete folder {path} and all its contents?"
   },
   "dashboard": {
     "title": "My Dashboard",

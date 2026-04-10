@@ -41,6 +41,7 @@ import {
   Pencil,
   FilePlus2,
   FolderPlus,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils";
@@ -132,6 +133,7 @@ export default function SkillDetailPage({
   const [readme, setReadme] = useState<string>("");
   const [fileTree, setFileTree] = useState<FileTreeNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<string>("");
+  const [selectedDirectory, setSelectedDirectory] = useState<string>("");
   const [fileContent, setFileContent] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState<string>("");
@@ -257,6 +259,9 @@ export default function SkillDetailPage({
 
   const handleSelectFile = async (filePath: string) => {
     setSelectedFile(filePath);
+    setSelectedDirectory(
+      filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : ""
+    );
     setIsEditing(false);
 
     try {
@@ -333,11 +338,22 @@ export default function SkillDetailPage({
     }
   };
 
-  const handleCreateInFiles = async (type: "file" | "directory") => {
+  const handleCreateInFiles = async (
+    type: "file" | "directory",
+    parentPath: string = ""
+  ) => {
     if (!isOwner) return;
-    const message = type === "file" ? t("newFilePath") : t("newFolderPath");
-    const inputPath = prompt(message, type === "file" ? "new-file.md" : "new-folder");
-    if (!inputPath) return;
+    const message = type === "file" ? t("newFileName") : t("newFolderName");
+    const defaultName = type === "file" ? "new-file.md" : "new-folder";
+    const inputName = prompt(
+      parentPath
+        ? t("createInPathPrompt", { path: parentPath })
+        : message,
+      defaultName
+    )?.trim();
+    if (!inputName) return;
+
+    const inputPath = parentPath ? `${parentPath}/${inputName}` : inputName;
 
     try {
       const res = await fetch(`/api/skills/${id}/files`, {
@@ -355,7 +371,111 @@ export default function SkillDetailPage({
       await refreshFileTree();
       if (type === "file") {
         await handleSelectFile(inputPath);
+      } else {
+        setSelectedDirectory(inputPath);
       }
+      toast({ title: tc("success"), variant: "success" });
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
+  const handleRenameInFiles = async (
+    currentPath: string,
+    type: "file" | "directory"
+  ) => {
+    if (!isOwner) return;
+    const lastSlashIndex = currentPath.lastIndexOf("/");
+    const parentPath =
+      lastSlashIndex === -1 ? "" : currentPath.slice(0, lastSlashIndex);
+    const currentName =
+      lastSlashIndex === -1 ? currentPath : currentPath.slice(lastSlashIndex + 1);
+
+    const newName = prompt(
+      t(type === "file" ? "renameFilePrompt" : "renameFolderPrompt"),
+      currentName
+    )?.trim();
+    if (!newName || newName === currentName) return;
+
+    const nextPath = parentPath ? `${parentPath}/${newName}` : newName;
+    const shouldRename = confirm(
+      t(type === "file" ? "renameFileConfirm" : "renameFolderConfirm", {
+        from: currentPath,
+        to: nextPath,
+      })
+    );
+    if (!shouldRename) return;
+
+    try {
+      const res = await fetch(`/api/skills/${id}/files/${currentPath}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPath: nextPath }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: data.error || tc("error"), variant: "destructive" });
+        return;
+      }
+
+      if (selectedFile === currentPath) {
+        setSelectedFile(nextPath);
+      } else if (selectedFile.startsWith(`${currentPath}/`)) {
+        setSelectedFile(selectedFile.replace(`${currentPath}/`, `${nextPath}/`));
+      }
+
+      if (selectedDirectory === currentPath) {
+        setSelectedDirectory(nextPath);
+      } else if (selectedDirectory.startsWith(`${currentPath}/`)) {
+        setSelectedDirectory(
+          selectedDirectory.replace(`${currentPath}/`, `${nextPath}/`)
+        );
+      }
+
+      await refreshFileTree();
+      toast({ title: tc("success"), variant: "success" });
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
+  const handleDeleteInFiles = async (
+    targetPath: string,
+    type: "file" | "directory"
+  ) => {
+    if (!isOwner) return;
+
+    const shouldDelete = confirm(
+      t(type === "file" ? "deleteFileConfirm" : "deleteFolderConfirm", {
+        path: targetPath,
+      })
+    );
+    if (!shouldDelete) return;
+
+    try {
+      const res = await fetch(`/api/skills/${id}/files/${targetPath}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: data.error || tc("error"), variant: "destructive" });
+        return;
+      }
+
+      if (selectedFile === targetPath || selectedFile.startsWith(`${targetPath}/`)) {
+        setSelectedFile("");
+        setFileContent("");
+        setIsEditing(false);
+      }
+
+      if (
+        selectedDirectory === targetPath ||
+        selectedDirectory.startsWith(`${targetPath}/`)
+      ) {
+        setSelectedDirectory("");
+      }
+
+      await refreshFileTree();
       toast({ title: tc("success"), variant: "success" });
     } catch {
       toast({ title: tc("error"), variant: "destructive" });
@@ -530,7 +650,9 @@ export default function SkillDetailPage({
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => handleCreateInFiles("directory")}
+                        onClick={() =>
+                          handleCreateInFiles("directory", selectedDirectory)
+                        }
                         title={t("createFolder")}
                       >
                         <FolderPlus className="h-3.5 w-3.5" />
@@ -539,7 +661,7 @@ export default function SkillDetailPage({
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => handleCreateInFiles("file")}
+                        onClick={() => handleCreateInFiles("file", selectedDirectory)}
                         title={t("createFile")}
                       >
                         <FilePlus2 className="h-3.5 w-3.5" />
@@ -555,7 +677,19 @@ export default function SkillDetailPage({
                         node={node}
                         path={node.name}
                         selectedFile={selectedFile}
+                        selectedDirectory={selectedDirectory}
                         onSelect={handleSelectFile}
+                        onSelectDirectory={setSelectedDirectory}
+                        onCreate={handleCreateInFiles}
+                        onRename={handleRenameInFiles}
+                        onDelete={handleDeleteInFiles}
+                        isOwner={isOwner}
+                        labels={{
+                          createFile: t("createFile"),
+                          createFolder: t("createFolder"),
+                          rename: t("rename"),
+                          delete: tc("delete"),
+                        }}
                       />
                     ))}
                   </div>
@@ -691,13 +825,32 @@ function FileTreeItem({
   node,
   path,
   selectedFile,
+  selectedDirectory,
   onSelect,
+  onSelectDirectory,
+  onCreate,
+  onRename,
+  onDelete,
+  isOwner,
+  labels,
   depth = 0,
 }: {
   node: FileTreeNode;
   path: string;
   selectedFile: string;
+  selectedDirectory: string;
   onSelect: (path: string) => void;
+  onSelectDirectory: (path: string) => void;
+  onCreate: (type: "file" | "directory", parentPath?: string) => void;
+  onRename: (path: string, type: "file" | "directory") => void;
+  onDelete: (path: string, type: "file" | "directory") => void;
+  isOwner: boolean;
+  labels: {
+    createFile: string;
+    createFolder: string;
+    rename: string;
+    delete: string;
+  };
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(depth < 1);
@@ -705,26 +858,74 @@ function FileTreeItem({
   if (node.type === "directory") {
     return (
       <div>
-        <button
-          onClick={() => setExpanded(!expanded)}
+        <div
           className={cn(
-            "flex items-center gap-1.5 w-full px-2 py-1.5 text-sm rounded-md hover:bg-surface-hover transition-colors text-left"
+            "group flex items-center gap-1 py-1 rounded-md",
+            selectedDirectory === path && "bg-accent/10"
           )}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
         >
-          <ChevronRight
-            className={cn(
-              "h-3.5 w-3.5 text-text-dim shrink-0 transition-transform",
-              expanded && "rotate-90"
+          <button
+            onClick={() => {
+              setExpanded(!expanded);
+              onSelectDirectory(path);
+            }}
+            className="flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1.5 text-sm rounded-md hover:bg-surface-hover transition-colors text-left"
+          >
+            <ChevronRight
+              className={cn(
+                "h-3.5 w-3.5 text-text-dim shrink-0 transition-transform",
+                expanded && "rotate-90"
+              )}
+            />
+            {expanded ? (
+              <FolderOpen className="h-4 w-4 text-accent shrink-0" />
+            ) : (
+              <Folder className="h-4 w-4 text-accent shrink-0" />
             )}
-          />
-          {expanded ? (
-            <FolderOpen className="h-4 w-4 text-accent shrink-0" />
-          ) : (
-            <Folder className="h-4 w-4 text-accent shrink-0" />
+            <span className="truncate">{node.name}</span>
+          </button>
+          {isOwner && (
+            <div className="flex items-center gap-0.5 pr-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-70 group-hover:opacity-100"
+                onClick={() => onCreate("directory", path)}
+                title={labels.createFolder}
+              >
+                <FolderPlus className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-70 group-hover:opacity-100"
+                onClick={() => onCreate("file", path)}
+                title={labels.createFile}
+              >
+                <FilePlus2 className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-70 group-hover:opacity-100"
+                onClick={() => onRename(path, "directory")}
+                title={labels.rename}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-destructive opacity-70 group-hover:opacity-100"
+                onClick={() => onDelete(path, "directory")}
+                title={labels.delete}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           )}
-          <span className="truncate">{node.name}</span>
-        </button>
+        </div>
         {expanded &&
           node.children?.map((child) => (
             <FileTreeItem
@@ -732,7 +933,14 @@ function FileTreeItem({
               node={child}
               path={`${path}/${child.name}`}
               selectedFile={selectedFile}
+              selectedDirectory={selectedDirectory}
               onSelect={onSelect}
+              onSelectDirectory={onSelectDirectory}
+              onCreate={onCreate}
+              onRename={onRename}
+              onDelete={onDelete}
+              isOwner={isOwner}
+              labels={labels}
               depth={depth + 1}
             />
           ))}
@@ -741,18 +949,41 @@ function FileTreeItem({
   }
 
   return (
-    <button
-      onClick={() => onSelect(path)}
-      className={cn(
-        "flex items-center gap-1.5 w-full px-2 py-1.5 text-sm rounded-md transition-colors text-left",
-        selectedFile === path
-          ? "bg-accent/10 text-accent"
-          : "hover:bg-surface-hover text-text-muted hover:text-text"
+    <div className="group flex items-center gap-1" style={{ paddingLeft: `${depth * 16 + 26}px` }}>
+      <button
+        onClick={() => onSelect(path)}
+        className={cn(
+          "flex items-center gap-1.5 flex-1 min-w-0 px-2 py-1.5 text-sm rounded-md transition-colors text-left",
+          selectedFile === path
+            ? "bg-accent/10 text-accent"
+            : "hover:bg-surface-hover text-text-muted hover:text-text"
+        )}
+      >
+        <FileText className="h-4 w-4 shrink-0" />
+        <span className="truncate">{node.name}</span>
+      </button>
+      {isOwner && (
+        <div className="flex items-center gap-0.5 pr-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 opacity-70 group-hover:opacity-100"
+            onClick={() => onRename(path, "file")}
+            title={labels.rename}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-destructive opacity-70 group-hover:opacity-100"
+            onClick={() => onDelete(path, "file")}
+            title={labels.delete}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       )}
-      style={{ paddingLeft: `${depth * 16 + 26}px` }}
-    >
-      <FileText className="h-4 w-4 shrink-0" />
-      <span className="truncate">{node.name}</span>
-    </button>
+    </div>
   );
 }
