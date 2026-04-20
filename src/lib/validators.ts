@@ -5,7 +5,7 @@ export const registerSchema = z.object({
     .string()
     .min(2, "Username must be at least 2 characters")
     .max(50, "Username must be at most 50 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, hyphens and underscores"),
+    .regex(/^[a-zA-Z0-9_\-\u4e00-\u9fff]+$/, "Username can only contain letters (including Chinese), numbers, hyphens and underscores"),
   email: z.string().email("Invalid email address"),
   password: z
     .string()
