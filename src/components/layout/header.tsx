@@ -97,10 +97,18 @@ export function Header() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild>
+                <Button
+                  variant={pathname === "/auth/login" ? "default" : "ghost"}
+                  size="sm"
+                  asChild
+                >
                   <Link href="/auth/login">{t("login")}</Link>
                 </Button>
-                <Button size="sm" asChild>
+                <Button
+                  variant={pathname === "/auth/login" ? "outline" : "default"}
+                  size="sm"
+                  asChild
+                >
                   <Link href="/auth/register">{t("register")}</Link>
                 </Button>
               </div>
@@ -150,10 +158,18 @@ export function Header() {
               </div>
             ) : (
               <div className="space-y-2">
-                <Button variant="outline" className="w-full" asChild>
+                <Button
+                  variant={pathname === "/auth/login" ? "default" : "outline"}
+                  className="w-full"
+                  asChild
+                >
                   <Link href="/auth/login">{t("login")}</Link>
                 </Button>
-                <Button className="w-full" asChild>
+                <Button
+                  variant={pathname === "/auth/login" ? "outline" : "default"}
+                  className="w-full"
+                  asChild
+                >
                   <Link href="/auth/register">{t("register")}</Link>
                 </Button>
               </div>
