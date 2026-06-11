@@ -45,27 +45,36 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const client = postgres(connectionString, { max: 1 });
-const db = drizzle(client);
+async function main() {
+  const client = postgres(connectionString!, { max: 1 });
+  const db = drizzle(client);
 
-const [user] = await db
-  .select({ id: users.id, username: users.username })
-  .from(users)
-  .where(eq(users.email, email))
-  .limit(1);
+  try {
+    const [user] = await db
+      .select({ id: users.id, username: users.username })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-if (!user) {
-  console.error(`Error: no user found with email "${email}"`);
-  await client.end();
-  process.exit(1);
+    if (!user) {
+      console.error(`Error: no user found with email "${email}"`);
+      process.exit(1);
+    }
+
+    const passwordHash = await hash(newPassword, 12);
+
+    await db
+      .update(users)
+      .set({ passwordHash, updatedAt: new Date() })
+      .where(eq(users.id, user.id));
+
+    console.log(`Password reset successfully for ${user.username} (${email})`);
+  } finally {
+    await client.end();
+  }
 }
 
-const passwordHash = await hash(newPassword, 12);
-
-await db
-  .update(users)
-  .set({ passwordHash, updatedAt: new Date() })
-  .where(eq(users.id, user.id));
-
-console.log(`Password reset successfully for ${user.username} (${email})`);
-await client.end();
+main().catch((err) => {
+  console.error("Error:", err.message);
+  process.exit(1);
+});
