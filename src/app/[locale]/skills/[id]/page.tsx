@@ -42,6 +42,7 @@ import {
   FilePlus2,
   FolderPlus,
   Trash2,
+  History,
 } from "lucide-react";
 import {
   Dialog,
@@ -80,6 +81,15 @@ interface FileTreeNode {
   type: "file" | "directory";
   size?: number;
   children?: FileTreeNode[];
+}
+
+interface SkillVersion {
+  id: string;
+  skillId: string;
+  version: string;
+  storagePath: string;
+  changelog: string | null;
+  createdAt: string;
 }
 
 interface AuthorSkill {
@@ -176,6 +186,11 @@ export default function SkillDetailPage({
   const [editContent, setEditContent] = useState<string>("");
   const [authorSkills, setAuthorSkills] = useState<AuthorSkill[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [versions, setVersions] = useState<SkillVersion[]>([]);
+  const [expandedVersion, setExpandedVersion] = useState<string | null>(null);
+  const [versionFileTree, setVersionFileTree] = useState<FileTreeNode | null>(null);
+  const [versionSelectedFile, setVersionSelectedFile] = useState<string>("");
+  const [versionFileContent, setVersionFileContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [summaryDraft, setSummaryDraft] = useState("");
@@ -248,6 +263,27 @@ export default function SkillDetailPage({
       .then((data) => setCategories(data.categories || []))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!skill) return;
+    fetch(`/api/skills/${id}/versions`)
+      .then((res) => res.json())
+      .then((data) => setVersions(data.versions || []))
+      .catch(() => {});
+  }, [skill, id]);
+
+  useEffect(() => {
+    if (!expandedVersion) {
+      setVersionFileTree(null);
+      setVersionSelectedFile("");
+      setVersionFileContent("");
+      return;
+    }
+    fetch(`/api/skills/${id}/versions/${encodeURIComponent(expandedVersion)}/files`)
+      .then((res) => res.json())
+      .then((data) => setVersionFileTree(data))
+      .catch(() => {});
+  }, [expandedVersion, id]);
 
   const handleStar = async () => {
     if (!skill) return;
@@ -566,6 +602,56 @@ export default function SkillDetailPage({
     }
   };
 
+  const handleSelectVersionFile = async (filePath: string) => {
+    setVersionSelectedFile(filePath);
+    try {
+      const res = await fetch(
+        `/api/skills/${id}/versions/${encodeURIComponent(expandedVersion!)}/files/${toRoutePath(filePath)}`
+      );
+      const data = await res.json();
+      setVersionFileContent(data.content || "");
+    } catch {
+      setVersionFileContent("Failed to load file");
+    }
+  };
+
+  const handleDownloadVersion = async (version: string) => {
+    try {
+      const res = await fetch(
+        `/api/skills/${id}/versions/${encodeURIComponent(version)}/download`
+      );
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${skill?.name}-${version}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
+  const handleDeleteVersion = async (version: string) => {
+    if (!confirm(t("deleteVersionConfirm", { version }))) return;
+    try {
+      const res = await fetch(
+        `/api/skills/${id}/versions/${encodeURIComponent(version)}`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: data.error || tc("error"), variant: "destructive" });
+        return;
+      }
+      setVersions((prev) => prev.filter((v) => v.version !== version));
+      if (expandedVersion === version) setExpandedVersion(null);
+      toast({ title: tc("success"), variant: "success" });
+    } catch {
+      toast({ title: tc("error"), variant: "destructive" });
+    }
+  };
+
   const filePreviewMarkdown = selectedFile
     ? `\`\`\`${getLanguageFromPath(selectedFile)}\n${fileContent}\n\`\`\`\n`
     : "";
@@ -723,6 +809,15 @@ export default function SkillDetailPage({
           <TabsTrigger value="files" className="gap-2">
             <Files className="h-4 w-4" />
             {t("files")}
+          </TabsTrigger>
+          <TabsTrigger value="versions" className="gap-2">
+            <History className="h-4 w-4" />
+            {t("versions")}
+            {versions.length > 0 && (
+              <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-black/20 text-xs">
+                {versions.length}
+              </span>
+            )}
           </TabsTrigger>
           <TabsTrigger value="author" className="gap-2">
             <Users className="h-4 w-4" />
@@ -893,6 +988,137 @@ export default function SkillDetailPage({
                 )}
               </div>
             </div>
+          </div>
+        </TabsContent>
+
+        {/* Versions Tab */}
+        <TabsContent value="versions">
+          <div className="rounded-xl border border-border bg-surface overflow-hidden">
+            {versions.length === 0 ? (
+              <div className="p-10 text-center">
+                <History className="h-10 w-10 mx-auto mb-3 text-text-dim opacity-30" />
+                <p className="text-text-muted">{t("noVersions")}</p>
+              </div>
+            ) : (
+              versions.map((v, index) => {
+                const isLatest = index === 0;
+                const isExpanded = expandedVersion === v.version;
+                const versionFilePreviewMarkdown = versionSelectedFile
+                  ? `\`\`\`${getLanguageFromPath(versionSelectedFile)}\n${versionFileContent}\n\`\`\`\n`
+                  : "";
+
+                return (
+                  <div key={v.id} className="border-b border-border last:border-b-0">
+                    <div className="flex items-start gap-3 p-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono font-semibold text-sm">{v.version}</span>
+                          {isLatest && (
+                            <span className="px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-medium">
+                              {t("latestBadge")}
+                            </span>
+                          )}
+                        </div>
+                        {v.changelog && (
+                          <p className="text-sm text-text-muted mt-0.5 line-clamp-2">{v.changelog}</p>
+                        )}
+                        <p className="text-xs text-text-dim mt-1">
+                          {t("releasedAt")} {formatRelativeTime(new Date(v.createdAt), locale)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1.5 text-xs"
+                          onClick={() => setExpandedVersion(isExpanded ? null : v.version)}
+                        >
+                          <Files className="h-3.5 w-3.5" />
+                          {isExpanded ? t("hideFiles") : t("browseFiles")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5 text-xs"
+                          onClick={() => handleDownloadVersion(v.version)}
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          {tc("download")}
+                        </Button>
+                        {isOwner && !isLatest && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            title={t("deleteVersionTitle")}
+                            onClick={() => handleDeleteVersion(v.version)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="border-t border-border">
+                        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[400px]">
+                          <div className="border-r border-border bg-surface">
+                            <ScrollArea className="h-[400px]">
+                              <div className="p-2">
+                                {versionFileTree?.children?.map((node) => (
+                                  <FileTreeItem
+                                    key={node.name}
+                                    node={node}
+                                    path={node.name}
+                                    selectedFile={versionSelectedFile}
+                                    selectedDirectory=""
+                                    onSelect={handleSelectVersionFile}
+                                    onSelectDirectory={() => {}}
+                                    onCreate={() => {}}
+                                    onRename={() => {}}
+                                    onDelete={() => {}}
+                                    isOwner={false}
+                                    labels={{
+                                      createFile: "",
+                                      createFolder: "",
+                                      rename: "",
+                                      delete: "",
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </ScrollArea>
+                          </div>
+                          <div className="flex flex-col min-w-0 overflow-hidden">
+                            {versionSelectedFile ? (
+                              <ScrollArea className="h-[400px]">
+                                <div className="p-4 min-w-0">
+                                  <div className="prose max-w-none min-w-full [&_pre]:max-w-none [&_pre]:min-w-max [&_pre]:whitespace-pre [&_code]:whitespace-pre [&_code]:break-normal">
+                                    <ReactMarkdown
+                                      remarkPlugins={[remarkGfm]}
+                                      rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+                                    >
+                                      {versionFilePreviewMarkdown}
+                                    </ReactMarkdown>
+                                  </div>
+                                </div>
+                              </ScrollArea>
+                            ) : (
+                              <div className="flex items-center justify-center h-[400px] text-text-dim">
+                                <div className="text-center">
+                                  <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                                  <p>{t("noFileSelected")}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
         </TabsContent>
 

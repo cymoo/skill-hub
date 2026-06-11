@@ -94,7 +94,16 @@
     "customSummaryPlaceholder": "Set a custom summary for skill cards...",
     "customSummaryHint": "If left empty, the summary automatically falls back to SKILL.md metadata description.",
     "saveSummary": "Save summary",
-    "editSummary": "Edit summary"
+    "editSummary": "Edit summary",
+    "versions": "Versions",
+    "noVersions": "No versions yet. Upload a ZIP to create a version snapshot.",
+    "latestBadge": "latest",
+    "browseFiles": "Browse Files",
+    "hideFiles": "Hide Files",
+    "deleteVersionTitle": "Delete Version",
+    "deleteVersionConfirm": "Are you sure you want to delete version {version}? This cannot be undone.",
+    "releasedAt": "Released",
+    "noFileSelected": "Select a file to view its content"
   },
   "dashboard": {
     "title": "My Dashboard",
@@ -115,7 +124,11 @@
     "createTitle": "Create a New Skill",
     "createDescription": "Start with a template and edit online",
     "skillName": "Skill Name",
-    "skillDescription": "Description"
+    "skillDescription": "Description",
+    "version": "Version",
+    "versionHint": "Semantic version, e.g. 1.0.0",
+    "changelog": "Changelog",
+    "changelogPlaceholder": "Describe what's new in this version..."
   },
   "category": {
     "manage": "Manage Categories",

@@ -4,6 +4,7 @@ import { skills, users, categories, stars } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { getSkillFullPath, deleteDirectory } from "@/lib/storage";
 import { eq, and, sql } from "drizzle-orm";
+import path from "path";
 
 export async function GET(
   _request: NextRequest,
@@ -187,11 +188,15 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Delete files
+    // Delete working dir
     const fullPath = getSkillFullPath(skill.storagePath);
     await deleteDirectory(fullPath);
 
-    // Delete from DB (cascades to stars)
+    // Delete all version snapshots for this skill
+    const skillVersionsDir = getSkillFullPath(path.join("__skill_versions", id));
+    await deleteDirectory(skillVersionsDir).catch(() => {});
+
+    // Delete from DB (cascades to stars and skill_versions)
     await db.delete(skills).where(eq(skills.id, id));
 
     return NextResponse.json({ success: true });

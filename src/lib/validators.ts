@@ -33,6 +33,15 @@ export const categorySchema = z.object({
   description: z.string().max(500).optional(),
 });
 
+export const semverSchema = z
+  .string()
+  .min(1, "Version is required")
+  .max(50, "Version must be at most 50 characters")
+  .regex(
+    /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/,
+    "Version must be a valid semver string (e.g. 1.0.0)"
+  );
+
 export const filePathSchema = z
   .string()
   .min(1)

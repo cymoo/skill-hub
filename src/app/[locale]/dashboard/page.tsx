@@ -99,6 +99,8 @@ export default function DashboardPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadCategoryId, setUploadCategoryId] = useState<string>("");
+  const [uploadVersion, setUploadVersion] = useState<string>("");
+  const [uploadChangelog, setUploadChangelog] = useState<string>("");
   const [uploading, setUploading] = useState(false);
 
   // Create dialog
@@ -160,7 +162,9 @@ export default function DashboardPage() {
     try {
       const formData = new FormData();
       formData.append("file", uploadFile);
+      formData.append("version", uploadVersion.trim());
       if (uploadCategoryId) formData.append("categoryId", uploadCategoryId);
+      if (uploadChangelog.trim()) formData.append("changelog", uploadChangelog.trim());
 
       const res = await fetch("/api/skills/upload", {
         method: "POST",
@@ -177,6 +181,8 @@ export default function DashboardPage() {
       setUploadOpen(false);
       setUploadFile(null);
       setUploadCategoryId("");
+      setUploadVersion("");
+      setUploadChangelog("");
       fetchData();
     } catch {
       toast({ title: tc("error"), variant: "destructive" });
@@ -370,6 +376,29 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label>
+                    {t("version")}
+                    <span className="ml-1 text-danger">*</span>
+                  </Label>
+                  <Input
+                    value={uploadVersion}
+                    onChange={(e) => setUploadVersion(e.target.value)}
+                    placeholder="1.0.0"
+                  />
+                  <p className="text-xs text-text-dim">{t("versionHint")}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t("changelog")}</Label>
+                  <Textarea
+                    value={uploadChangelog}
+                    onChange={(e) => setUploadChangelog(e.target.value)}
+                    placeholder={t("changelogPlaceholder")}
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>{t("selectCategory")}</Label>
                   <Select
                     value={uploadCategoryId}
@@ -390,7 +419,7 @@ export default function DashboardPage() {
 
                 <Button
                   onClick={handleUpload}
-                  disabled={!uploadFile || uploading}
+                  disabled={!uploadFile || !uploadVersion.trim() || uploading}
                   className="w-full"
                 >
                   {uploading && <Loader2 className="h-4 w-4 animate-spin" />}

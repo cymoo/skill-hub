@@ -12,6 +12,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   username: varchar("username", { length: 50 }).notNull().unique(),
@@ -70,4 +71,22 @@ export const stars = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [primaryKey({ columns: [table.userId, table.skillId] })]
+);
+
+export const skillVersions = pgTable(
+  "skill_versions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    skillId: uuid("skill_id")
+      .references(() => skills.id, { onDelete: "cascade" })
+      .notNull(),
+    version: varchar("version", { length: 50 }).notNull(),
+    storagePath: varchar("storage_path", { length: 500 }).notNull(),
+    changelog: text("changelog"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_skill_versions_skill_id").on(table.skillId),
+    uniqueIndex("idx_skill_versions_skill_version").on(table.skillId, table.version),
+  ]
 );

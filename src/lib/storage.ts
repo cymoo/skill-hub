@@ -138,3 +138,21 @@ export function getSkillFullPath(storagePath: string): string {
 export function generateStoragePath(userId: string, skillName: string): string {
   return `${userId}/${skillName}`;
 }
+
+export function generateVersionStoragePath(skillId: string, version: string): string {
+  return `__skill_versions/${skillId}/${version}`;
+}
+
+export async function copyDirectory(src: string, dest: string): Promise<void> {
+  await ensureDir(dest);
+  const entries = await fs.readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      await copyDirectory(srcPath, destPath);
+    } else {
+      await fs.copyFile(srcPath, destPath);
+    }
+  }
+}

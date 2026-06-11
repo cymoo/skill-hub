@@ -94,7 +94,16 @@
     "customSummaryPlaceholder": "为技能卡片设置自定义简介...",
     "customSummaryHint": "留空时会自动回退为 SKILL.md metadata 中的 description。",
     "saveSummary": "保存简介",
-    "editSummary": "编辑简介"
+    "editSummary": "编辑简介",
+    "versions": "版本历史",
+    "noVersions": "暂无版本记录，上传 ZIP 时可创建版本快照",
+    "latestBadge": "最新",
+    "browseFiles": "查看文件",
+    "hideFiles": "收起文件",
+    "deleteVersionTitle": "删除版本",
+    "deleteVersionConfirm": "确定删除版本 {version} 吗？此操作不可撤销。",
+    "releasedAt": "发布于",
+    "noFileSelected": "选择一个文件查看内容"
   },
   "dashboard": {
     "title": "我的控制台",
@@ -115,7 +124,11 @@
     "createTitle": "创建新技能",
     "createDescription": "从模板开始，在线编辑",
     "skillName": "技能名称",
-    "skillDescription": "描述"
+    "skillDescription": "描述",
+    "version": "版本号",
+    "versionHint": "语义化版本，如 1.0.0",
+    "changelog": "更新说明",
+    "changelogPlaceholder": "描述此版本的主要变更..."
   },
   "category": {
     "manage": "管理分类",
