@@ -57,15 +57,23 @@
    认证 Cookie 的 `secure` 标志解析优先级：`x-forwarded-proto`（代理）→ 当前请求协议 → `NEXT_PUBLIC_APP_URL` 协议 → `NODE_ENV` 兜底。`NEXT_PUBLIC_APP_URL` 以 `https://` 开头时启用 `secure`，以 `http://` 开头时禁用。
 
 3. **创建数据库：**
+
+   `createdb` 是 PostgreSQL 自带的命令行工具，**不是** npm 包，请勿使用 `npx` 运行。
    ```bash
    createdb skillhub
    ```
+   如果 `createdb` 不在 PATH 中，可改用 `psql`：
+   ```bash
+   psql -U postgres -c "CREATE DATABASE skillhub;"
+   ```
+   也可以使用 pgAdmin、TablePlus 等图形界面工具创建。数据库名须与 `DATABASE_URL` 中一致。
 
 4. **执行迁移：**
    ```bash
    npm run db:generate
    npm run db:migrate
    ```
+   > `drizzle-kit` 不会自动读取 Next.js 的 `.env.local`。项目的 `drizzle.config.ts` 已处理该问题，只要 `DATABASE_URL` 配置在 `.env.local` 或 `.env` 中，无需额外操作。
 
 5. **填充演示数据（可选）：**
    ```bash

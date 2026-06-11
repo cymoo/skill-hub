@@ -57,15 +57,23 @@ An open platform for uploading, managing, sharing, and discovering AI Agent Skil
    The auth cookie `secure` flag is resolved in this order: `x-forwarded-proto` (proxy) → current request protocol → `NEXT_PUBLIC_APP_URL` protocol → `NODE_ENV` fallback. For `NEXT_PUBLIC_APP_URL`, `https://` enables `secure`, while `http://` disables it.
 
 3. **Create the database:**
+
+   `createdb` is a PostgreSQL CLI utility (not an npm package — do not use `npx`).
    ```bash
    createdb skillhub
    ```
+   If `createdb` is not in your PATH, use `psql` instead:
+   ```bash
+   psql -U postgres -c "CREATE DATABASE skillhub;"
+   ```
+   You can also use any GUI tool (pgAdmin, TablePlus, etc.). The database name must match the one in `DATABASE_URL`.
 
 4. **Run migrations:**
    ```bash
    npm run db:generate
    npm run db:migrate
    ```
+   > `drizzle-kit` does not auto-load `.env.local`. The project's `drizzle.config.ts` handles this automatically, so no extra steps are needed as long as your `DATABASE_URL` is in `.env.local` or `.env`.
 
 5. **Seed demo data (optional):**
    ```bash
