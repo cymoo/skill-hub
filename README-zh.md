@@ -53,6 +53,8 @@
    UPLOAD_DIR=./data/skills
    MAX_ZIP_SIZE_MB=50
    NEXT_PUBLIC_APP_URL=http://localhost:3000
+   # 可选：在登录页展示管理员联系邮箱，供用户申请找回密码
+   # NEXT_PUBLIC_CONTACT_EMAIL=admin@example.com
    ```
    认证 Cookie 的 `secure` 标志解析优先级：`x-forwarded-proto`（代理）→ 当前请求协议 → `NEXT_PUBLIC_APP_URL` 协议 → `NODE_ENV` 兜底。`NEXT_PUBLIC_APP_URL` 以 `https://` 开头时启用 `secure`，以 `http://` 开头时禁用。
 
@@ -96,6 +98,21 @@ npm start
 ```
 
 应用使用 `output: "standalone"` 支持自托管，`.next/standalone` 可独立部署。
+
+## 密码重置
+
+本项目不提供自助找回密码功能。管理员可在服务器上通过 CLI 脚本重置用户密码：
+
+```bash
+npm run reset-password -- <邮箱> <新密码>
+```
+
+示例：
+```bash
+npm run reset-password -- user@example.com newpassword123
+```
+
+如需引导用户申请重置，在 `.env.local` 中配置 `NEXT_PUBLIC_CONTACT_EMAIL`，登录页将自动显示"忘记密码？请联系管理员：…"提示。
 
 ## 版本管理
 

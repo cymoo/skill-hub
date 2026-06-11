@@ -113,6 +113,17 @@ export default function LoginPage() {
                 {tc("register")}
               </Link>
             </p>
+            {process.env.NEXT_PUBLIC_CONTACT_EMAIL && (
+              <p className="text-xs text-text-dim text-center">
+                {t("forgotPassword")}{" "}
+                <a
+                  href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+                  className="text-accent hover:underline"
+                >
+                  {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
+                </a>
+              </p>
+            )}
           </CardFooter>
         </form>
       </Card>

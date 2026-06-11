@@ -53,6 +53,8 @@ An open platform for uploading, managing, sharing, and discovering AI Agent Skil
    UPLOAD_DIR=./data/skills
    MAX_ZIP_SIZE_MB=50
    NEXT_PUBLIC_APP_URL=http://localhost:3000
+   # Optional: show a contact email on the login page for password reset requests
+   # NEXT_PUBLIC_CONTACT_EMAIL=admin@example.com
    ```
    The auth cookie `secure` flag is resolved in this order: `x-forwarded-proto` (proxy) → current request protocol → `NEXT_PUBLIC_APP_URL` protocol → `NODE_ENV` fallback. For `NEXT_PUBLIC_APP_URL`, `https://` enables `secure`, while `http://` disables it.
 
@@ -96,6 +98,21 @@ npm start
 ```
 
 The app uses `output: "standalone"` for self-hosting. The build output in `.next/standalone` can be deployed independently.
+
+## Password Reset
+
+There is no self-service password reset flow. Admins can reset a user's password from the server using the CLI script:
+
+```bash
+npm run reset-password -- <email> <new-password>
+```
+
+Example:
+```bash
+npm run reset-password -- user@example.com newpassword123
+```
+
+To let users know how to request a reset, set `NEXT_PUBLIC_CONTACT_EMAIL` in your `.env.local`. When set, a "Forgot password? Contact admin: …" hint appears on the login page.
 
 ## Versioning
 

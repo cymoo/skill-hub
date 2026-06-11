@@ -55,7 +55,8 @@
     "hasAccount": "已有账户？",
     "passwordMismatch": "两次输入的密码不一致",
     "registerSuccess": "账户创建成功",
-    "loginSuccess": "登录成功"
+    "loginSuccess": "登录成功",
+    "forgotPassword": "忘记密码？请联系管理员："
   },
   "skill": {
     "readme": "说明文档",

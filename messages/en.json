@@ -55,7 +55,8 @@
     "hasAccount": "Already have an account?",
     "passwordMismatch": "Passwords do not match",
     "registerSuccess": "Account created successfully",
-    "loginSuccess": "Signed in successfully"
+    "loginSuccess": "Signed in successfully",
+    "forgotPassword": "Forgot your password? Contact the admin:"
   },
   "skill": {
     "readme": "README",
